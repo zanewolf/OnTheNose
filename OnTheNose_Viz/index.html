@@ -18,34 +18,19 @@
 	<!-- DON'T WRITE CSS IN YOUR HTML LIKE WE DID HERE - THE INLINE CSS SHOULD HELP YOU TO UNDERSTAND THE BEHAVIOR OF THE ELEMENTS BETTER -
 		 WHEN SUBMITTING, WE ALWAYS EXPECT CLEAR SEPARATION OF HTML, CSS, AND JS INTO THE PROPER FILES -->
 	<body style="padding: 5vh">
-	<div class="container-fluid" style="border: thin solid grey; border-radius: 5px">
-		<div class="row justify-content-center" style="height: 12vh; background: #22223b;">
+	<div class="container-fluid" >
+		<div class="row justify-content-center" style="height: 12vh;">
 			<div class="align-self-center">
-				<h1 style="color: #F2E9E4">On The Nose</h1>
+				<h1>On The Nose</h1>
 			</div>
 		</div>
-		<div class="row" style="height: 70vh">
-			<div class="col-6" style="background: #4A4E69">
-				<div class="row justify-content-center" style="height: 100%">
-					<div class="align-self-center">
-						<p>left</p>
-					</div>
-				</div>
+		<div class="row" style="height: 70vh; background: #9b3030">
+			<div class = "col justify-content-center" id = "bubble-vis">
+
 			</div>
-			<div class="col-6" style="background: #9A8C98">
-				<div class="row justify-content-center" style="height: 100%">
-					<div class="align-self-center">
-						<p style="text-align: center">
-							useful links:<br>
-							<a href="https://coolors.co/22223b-4a4e69-9a8c98-c9ada7-f2e9e4">color palettes</a><br>
-							<a href="https://colorbrewer2.org/#type=sequential&scheme=BuGn&n=3">color brewer</a><br>
-							(add your own)
-						</p>
-					</div>
-				</div>
-			</div>
+
 		</div>
-		<div class="row" style="height: 7vh; background: #C9ADA7"></div>
+
 	</div>
 
 
@@ -62,5 +47,7 @@
 
 	<!-- own js files -->
 	<script src="js/main.js"></script>
+	<script src="js/bubble.js"></script>
+	<script src="js/clusters.js"></script>
 	</body>
 </html>

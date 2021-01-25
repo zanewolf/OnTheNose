@@ -1,4 +1,4 @@
-let bubbleVis;
+let bubbleVis, clusterVis;
 
 let timeParser = d3.timeParse("%m/%Y")
 let timeParser2= d3.timeParse("%m/%d/%Y")
@@ -7,15 +7,16 @@ let monthFormatter = d3.timeFormat("%B")
 let yearFormatter = d3.timeFormat("%Y")
 
 let promises = [
-    d3.csv("data/onthenoseData.csv")
+    d3.csv("data/onthenoseData.csv"),
+    d3.csv("data/data.csv")
 ]
 Promise.all(promises)
-    .then( d=>{
-        // console.log(d);
+    .then( function(data){
+        // console.log(data[0]);
 
-        d.forEach(d=>{
-            d.forEach(d=> {
-                console.log(d["Date-Full"])
+        data[0].forEach(d=>{
+            // console.log(d)
+            //     console.log(d["Date-Full"])
 
                 // convert d.Date to actual date object first
                 if (d["Date-Full"]===""){
@@ -29,13 +30,19 @@ Promise.all(promises)
 
                 let res = d.Time.split(":")
                 d.HoursRounded = parseFloat((Math.round((parseFloat(res[0])*3600+parseFloat(res[1])*60+parseFloat(res[2]))/3600*10)/10).toFixed(1));
-                console.log(d)
-            })
+                // console.log(d)
+
         })
 
         // need to convert the Time column into something more meaningful than a string
 
-        console.log(d)
+        // console.log(data)
+        createVis(data)
 
     })
-    .catch(function(err){console.log("error reading in data")})
+    .catch(function(err){console.log("error, ya goofball")})
+
+function createVis(data){
+    // bubbleVis = new BubbleVis("bubble-vis", data)
+    clusterVis = new ClusterVis("bubble-vis", data[1])
+}
