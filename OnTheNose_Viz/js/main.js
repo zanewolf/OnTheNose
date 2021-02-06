@@ -40,9 +40,15 @@ Promise.all(promises)
         createVis(data)
 
     })
-    .catch(function(err){console.log("error, ya goofball")})
+    // .catch(function(err){console.log("error, ya goofball")})
 
 function createVis(data){
     // bubbleVis = new BubbleVis("bubble-vis", data)
-    clusterVis = new ClusterVis("bubble-vis", data[1])
+    clusterVis = new BubbleChart("bubble-vis", data[0])
+}
+
+function updateSelectedGroup(){
+    // console.log(data2[$('#rs-range-line').val()])
+    clusterVis.wrangleData(data2[$('#rs-range-line').val()])
+
 }
