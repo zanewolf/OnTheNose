@@ -20,9 +20,6 @@ class BubbleChart {
     initVis() {
         let vis = this;
 
-        // vis.nodes=[]
-
-
         //set up svg area
         vis.margin = {top: 10, right: 10, bottom: 10, left: 10};
         vis.width = $("#" + vis.parentElement).width() - vis.margin.left - vis.margin.right;
@@ -38,7 +35,6 @@ class BubbleChart {
         // commented transform out because it was throwing off all the position calculations
 
         // init tooltip
-
         vis.tooltip = d3.select("body").append('div')
             .attr('class', "tooltip")
             .attr('id', 'tooltip');
@@ -82,8 +78,9 @@ class BubbleChart {
 
         // let myvar= "Alll";
 
-        vis.plotBubbles(vis.centerBubbles);
+        // vis.plotBubbles(vis.centerBubbles);
 
+        vis.plotMaster("All")
     }
 
     createCircles(){
@@ -134,17 +131,45 @@ class BubbleChart {
 
     }
 
+    plotMaster(selectedGroup){
+        let vis = this;
+        let plottingFunction;
+        vis.selectedGroup = selectedGroup;
+
+        if (vis.selectedGroup=="All"){
+                // centerBubbles()
+                // addOverviewFacts()
+                plottingFunction = vis.centerBubbles
+
+            } else if (vis.selectedGroup=="Year"){
+                // splitbyYear()
+                plottingFunction = centerBubbles
+
+            } else if (vis.selectedGroup=="Month") {
+                // splitbyMonth()
+                plottingFunction = centerBubbles
+
+            } else if (vis.selectedGroup=="Partner") {
+                // splitbyParnter()
+                plottingFunction = centerBubbles
+
+            } else if (vis.selectedGroup=="Records") {
+                // splitbyRecord()
+                plottingFunction = vis.splitByRecords
+
+            } else {
+                console.warn("Button does not match acceptable options")
+            }
+
+        vis.plotBubbles(plottingFunction)
+
+    }
+
     plotBubbles(coordGenerator) {
         // only called if buttons are clicked, otherwise x,y are assigned default random values
         let vis = this;
 
-        // vis.selectedGroup = selectedGroup;
-        // console.log(coordGenerator)
-        // function centerBubbles(){
-        //     return (vis.width/2);
-        // }
-
-        vis.simulation.force('x', d3.forceX().strength(vis.forceStrength).x(coordGenerator));
+        vis.simulation.force('x', d3.forceX().strength(vis.forceStrength).x(d=>coordGenerator(d,vis)));
 
         // if (vis.selectedGroup === "All") {
         //     vis.simulation.force('x', d3.forceX().strength(vis.forceStrength).x(vis.width / 2));
@@ -161,15 +186,26 @@ class BubbleChart {
 
         // vis.updateVis()
     }
-     centerBubbles(d){
+     centerBubbles(d,vis){
         console.log('centerbubbles',d)
-        return (900/2);
-     //   return (vis.width/2);
+        // return (900/2);
+       return (vis.width/2);
      }
 
-     splitByRecords(vis,d){
-        console.log('splitbyRecoreds',d)
-         return
+     splitByRecords(d, vis){
+        console.log('splitbyRecords',d)
+         return (d.record === 'none'? vis.width / 4 : vis.width*3/4);
+     }
+
+     splitByYear(d,vis){
+
+     }
+
+     splitByPartner(d,vis){
+
+     }
+     splitByMonth(d,vis){
+
      }
 
     updateVis(){
