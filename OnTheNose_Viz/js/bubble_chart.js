@@ -48,7 +48,7 @@ class BubbleChart {
         // set up scale for radius
         vis.radiusScale = d3.scalePow()
             .exponent(0.5)
-            .range([2,50])
+            .range([1,40])
             .domain([0, d3.max(vis.data, d=>d.HoursRounded)])
 
         // wrangle the data into the node format
@@ -73,7 +73,7 @@ class BubbleChart {
         vis.simulation = d3.forceSimulation()
             .velocityDecay(0.2)
             .force('x', d3.forceX().strength(vis.forceStrength).x(vis.width/2))
-            .force('y', d3.forceY().strength(vis.forceStrength).y(vis.height/2))
+            .force('y', d3.forceY().strength(vis.forceStrength).y(vis.height/1.8))
             .force('charge', d3.forceManyBody().strength(charge))
             .on('tick', ticked);
         vis.simulation.stop();
@@ -82,7 +82,7 @@ class BubbleChart {
 
         // let myvar= "Alll";
 
-        vis.plotBubbles("All");
+        vis.plotBubbles(vis.centerBubbles);
 
     }
 
@@ -103,11 +103,11 @@ class BubbleChart {
             .attr("opacity", 1)
             .attr("fill", d=>d.color_fill)
             .on("mouseover", (event,d)=>{
-                console.log(d)
+                // console.log(d)
                 vis.tooltip
                     .style("opacity", 1)
-                    .style("left", event.pageX + "px")
-                    .style("top", event.pageY + "px")
+                    .style("left", event.pageX+10 + "px")
+                    .style("top", event.pageY+10 + "px")
                     .attr('id', 'tooltip')
                     .html(`
                      <div style="border: thin solid grey; border-radius: 5px; background: darkgray; padding: 20px">
@@ -115,10 +115,13 @@ class BubbleChart {
                          <p> <strong> Partners: </strong> ${d.partners}</p>
 
                      </div>`)
-
-                                // rocket type tooltip
-                    // vis.tooltip
-
+            })
+            .on("mouseout", (event,d)=>{
+                vis.tooltip
+                    .style("opacity", 0)
+                    .style("left", 0)
+                    .style("top", 0)
+                    .html(``);
             })
 
         vis.bubbles = d3.selectAll('.bubble');
@@ -131,24 +134,43 @@ class BubbleChart {
 
     }
 
-    plotBubbles(selectedGroup){
+    plotBubbles(coordGenerator) {
         // only called if buttons are clicked, otherwise x,y are assigned default random values
         let vis = this;
 
-        vis.selectedGroup = selectedGroup;
-        console.log(vis.selectedGroup)
+        // vis.selectedGroup = selectedGroup;
+        // console.log(coordGenerator)
+        // function centerBubbles(){
+        //     return (vis.width/2);
+        // }
 
-        if (vis.selectedGroup==="All") {
-            vis.simulation.force('x', d3.forceX().strength(vis.forceStrength).x(vis.width / 2));
-        } else {
-            vis.simulation.force('x', d3.forceX().strength(vis.forceStrength).x(vis.width/4))
-        }
+        vis.simulation.force('x', d3.forceX().strength(vis.forceStrength).x(coordGenerator));
+
+        // if (vis.selectedGroup === "All") {
+        //     vis.simulation.force('x', d3.forceX().strength(vis.forceStrength).x(vis.width / 2));
+        // } else if (vis.selectedGroup==="Records"){
+        //     vis.simulation.force('x', d3.forceX().strength(vis.forceStrength).x( d=> d.record === 'none'? vis.width / 4 : vis.width*3/4));
+        //
+        // } else {
+        //     vis.simulation.force('x', d3.forceX().strength(vis.forceStrength).x(coordGenerator))
+        // }
 
         // @v4 We can reset the alpha value and restart the simulation
         vis.simulation.alpha(1).restart();
 
+
         // vis.updateVis()
     }
+     centerBubbles(d){
+        console.log('centerbubbles',d)
+        return (900/2);
+     //   return (vis.width/2);
+     }
+
+     splitByRecords(vis,d){
+        console.log('splitbyRecoreds',d)
+         return
+     }
 
     updateVis(){
         let vis = this;
@@ -174,7 +196,7 @@ class BubbleChart {
                  month: d.Month,
                  numPartner: d.numPartner,
                  partners: d.Partners,
-                 award: d.Record===''? 'none' : d.Record,
+                 record: d.Record===''? 'none' : d.Record,
                  x: Math.random()*900,
                  y: Math.random()*500
              })
@@ -185,33 +207,9 @@ class BubbleChart {
         // console.log(nodes)
     }
 
-    // charge(d) {
-    //     let vis = this;
-    //     // var forceStrength = 0.03;
-    //     console.log(vis.forceStrength)
-    //     // return -Math.pow(d.scaled_radius, 2.0) * forceStrength;
-    // }
-    //
-    // ticked() {
-    //     let vis = this;
-    //
-    //     // console.log(vis.alpha())
-    //     vis.bubbles
-    //         .attr('cx', function (d) { return d.x; })
-    //         .attr('cy', function (d) { return d.y; });
-    //     // vis.bubbles.each(function (node) {})
-    //     //     .attr("cx", function(d) { return d.x; })
-    //     //     .attr("cy", function(d) { return d.y; });
-    // }
+    splitbyPartner(d){
+        console.log("here")
+    }
 
-    // groupBubbles() {
-    //     // hideYearTitles();
-    //
-    //     // @v4 Reset the 'x' force to draw the bubbles to the center.
-    //     vis.simulation.force('x', d3.forceX().strength(forceStrength).x(center.x));
-    //
-    //     // @v4 We can reset the alpha value and restart the simulation
-    //     vis.simulation.alpha(1).restart();
-    // }
 }
 

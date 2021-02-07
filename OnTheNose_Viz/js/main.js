@@ -51,7 +51,37 @@ function createVis(data){
 }
 
 function updateSelectedGroup(){
+    let vis;
+    let plottingFunction;
+
+    if (data2[$('#rs-range-line').val()]=="All"){
+        // centerBubbles()
+        // addOverviewFacts()
+        plottingFunction = centerBubbles
+        // console.log( plottingFunction)
+
+    } else if (data2[$('#rs-range-line').val()]=="Year"){
+        // splitbyYear()
+        plottingFunction = centerBubbles
+
+    } else if (data2[$('#rs-range-line').val()]=="Month") {
+        // splitbyMonth()
+        plottingFunction = centerBubbles
+
+    } else if (data2[$('#rs-range-line').val()]=="Partner") {
+        // splitbyParnter()
+        plottingFunction = centerBubbles
+
+    } else if (data2[$('#rs-range-line').val()]=="Records") {
+        // splitbyRecord()
+        plottingFunction = vis.splitByRecords
+
+    } else {
+        console.warn("Button does not match acceptable options")
+    }
+
     // console.log(data2[$('#rs-range-line').val()])
-    clusterVis.plotBubbles(data2[$('#rs-range-line').val()])
+    clusterVis.plotBubbles(plottingFunction)
+    // clusterVis.plotMaster(data2[$('#rs-range-line').val()])
 
 }
