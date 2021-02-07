@@ -5,6 +5,7 @@ class BubbleChart {
         this.parentElement = _parentElement;
         // this.legendElement = _legendElement;
         this.data = data;
+        this.forceStrength = 0.03;
         //this.practiceData = practiceData;
         // console.log(this.data)
 
@@ -33,56 +34,127 @@ class BubbleChart {
             .attr("width", vis.width + vis.margin.left + vis.margin.right)
             .attr("height", vis.height + vis.margin.top + vis.margin.bottom)
             .append('g')
-            .attr('transform', `translate (${vis.width / 2}, ${vis.height / 2})`);
+            // .attr('transform', `translate (${vis.width / 2}, ${vis.height / 2})`);
+        // commented transform out because it was throwing off all the position calculations
+
+        // init tooltip
+
+        vis.tooltip = d3.select("body").append('div')
+            .attr('class', "tooltip")
+            .attr('id', 'tooltip');
+
 
 
         // set up scale for radius
-        vis.maxRadius =
         vis.radiusScale = d3.scalePow()
             .exponent(0.5)
-            .range([2,25])
+            .range([2,50])
             .domain([0, d3.max(vis.data, d=>d.HoursRounded)])
 
-        // console.log(vis.radiusScale(96))
-
-        // onl
+        // wrangle the data into the node format
         vis.nodes=vis.createNodes()
 
-        // var simulation = forceSimulation()
-        //     .velocityDecay(0.2)
-        //
-        // simulation.stop() //pauses the simulation until nodes are created
-        //
-        // simulation.force('center', d3.forceCenter(width/2, height/2));
-        //
-        // var center = {x: width / 2, y: height / 2};
-        // var forceStrength = 0.03;
-        //
-        // var simulation = d3.forceSimulation()
-        //     .velocityDecay(0.2)
-        //     .force('x', d3.forceX().strength(forceStrength).x(center.x))
-        //     .force('y', d3.forceY().strength(forceStrength).y(center.y))
-        //     .force('charge', d3.forceManyBody().strength(charge))
-        //     .on('tick', ticked);
+        // create the initial circles with no grouping
+        vis.createCircles()
 
-        // vis.wrangleData()
+        function charge(d) {
+            return -Math.pow(d.scaled_radius, 2.0) * vis.forceStrength;
+        }
+
+        function ticked() {
+            // console.log(vis.alpha())
+            vis.bubbles
+                .attr('cx', function (d) { return d.x; })
+                .attr('cy', function (d) { return d.y; });
+        }
+
+
+
+        vis.simulation = d3.forceSimulation()
+            .velocityDecay(0.2)
+            .force('x', d3.forceX().strength(vis.forceStrength).x(vis.width/2))
+            .force('y', d3.forceY().strength(vis.forceStrength).y(vis.height/2))
+            .force('charge', d3.forceManyBody().strength(charge))
+            .on('tick', ticked);
+        vis.simulation.stop();
+        //
+        vis.simulation.nodes(vis.nodes);
+
+        // let myvar= "Alll";
+
+        vis.plotBubbles("All");
+
     }
 
-    wrangleData(selectedGroup){
-        // only called in buttons are clicked, otherwise x,y are assigned default random values
+    createCircles(){
         let vis = this;
+
+        console.log(vis.nodes)
+
+        vis.svg.selectAll("circle")
+            .data(vis.nodes)
+            .enter()
+            .append("circle")
+            .attr("class", "bubble")
+            .attr('cx', function (d) { return d.x; })
+            .attr('cy', function (d) { return d.y; })
+            .attr("r", 0)
+            .attr("stroke", "black")
+            .attr("opacity", 1)
+            .attr("fill", d=>d.color_fill)
+            .on("mouseover", (event,d)=>{
+                console.log(d)
+                vis.tooltip
+                    .style("opacity", 1)
+                    .style("left", event.pageX + "px")
+                    .style("top", event.pageY + "px")
+                    .attr('id', 'tooltip')
+                    .html(`
+                     <div style="border: thin solid grey; border-radius: 5px; background: darkgray; padding: 20px">
+                         <p> <strong>Total Time: </strong>${d.actual_time}</p>
+                         <p> <strong> Partners: </strong> ${d.partners}</p>
+
+                     </div>`)
+
+                                // rocket type tooltip
+                    // vis.tooltip
+
+            })
+
+        vis.bubbles = d3.selectAll('.bubble');
+
+        // Fancy transition to make bubbles appear, ending with the correct radius
+        vis.bubbles.transition()
+            .duration(1000)
+            .attr('r', d=> d.scaled_radius);
+
+
+    }
+
+    plotBubbles(selectedGroup){
+        // only called if buttons are clicked, otherwise x,y are assigned default random values
+        let vis = this;
+
         vis.selectedGroup = selectedGroup;
-
         console.log(vis.selectedGroup)
-        // depending on button selected, assign new x,y coordinates to
 
+        if (vis.selectedGroup==="All") {
+            vis.simulation.force('x', d3.forceX().strength(vis.forceStrength).x(vis.width / 2));
+        } else {
+            vis.simulation.force('x', d3.forceX().strength(vis.forceStrength).x(vis.width/4))
+        }
 
+        // @v4 We can reset the alpha value and restart the simulation
+        vis.simulation.alpha(1).restart();
 
         // vis.updateVis()
     }
 
     updateVis(){
         let vis = this;
+
+        // vis.createBubbles()
+        // vis.addForceLayout()
 
     }
 
@@ -95,21 +167,51 @@ class BubbleChart {
              nodes.push({
                  id: i,
                  scaled_radius: vis.radiusScale(d.HoursRounded),
-                 actual_radius: d.HoursRounded,
+                 rounded_time: d.HoursRounded,
+                 actual_time: d.Time,
                  color_fill: d.Record===''? 'white' : 'black',
                  year: d.Year,
                  month: d.Month,
-                 numPartner: d['Num. Partners'],
+                 numPartner: d.numPartner,
+                 partners: d.Partners,
                  award: d.Record===''? 'none' : d.Record,
                  x: Math.random()*900,
-                 y: Math.random()*800
+                 y: Math.random()*500
              })
          })
 
-        console.log(nodes)
+        return nodes
 
-
-
+        // console.log(nodes)
     }
+
+    // charge(d) {
+    //     let vis = this;
+    //     // var forceStrength = 0.03;
+    //     console.log(vis.forceStrength)
+    //     // return -Math.pow(d.scaled_radius, 2.0) * forceStrength;
+    // }
+    //
+    // ticked() {
+    //     let vis = this;
+    //
+    //     // console.log(vis.alpha())
+    //     vis.bubbles
+    //         .attr('cx', function (d) { return d.x; })
+    //         .attr('cy', function (d) { return d.y; });
+    //     // vis.bubbles.each(function (node) {})
+    //     //     .attr("cx", function(d) { return d.x; })
+    //     //     .attr("cy", function(d) { return d.y; });
+    // }
+
+    // groupBubbles() {
+    //     // hideYearTitles();
+    //
+    //     // @v4 Reset the 'x' force to draw the bubbles to the center.
+    //     vis.simulation.force('x', d3.forceX().strength(forceStrength).x(center.x));
+    //
+    //     // @v4 We can reset the alpha value and restart the simulation
+    //     vis.simulation.alpha(1).restart();
+    // }
 }
 

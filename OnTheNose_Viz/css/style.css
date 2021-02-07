@@ -19,19 +19,19 @@ h1 {
     align-items: center;
     justify-content: center;
 }
-.box-minmax{
-    margin-top: 30px;
-    width: 608px;
-    display: flex;
-    justify-content: space-between;
-    font-size: 20px;
-    color: #000;
-    span:first-child{
-        margin-left: 10px;
-    }
-}
+/*.box-minmax{*/
+/*    margin-top: 30px;*/
+/*    width: 608px;*/
+/*    display: flex;*/
+/*    justify-content: space-between;*/
+/*    font-size: 20px;*/
+/*    color: #000;*/
+/*    span:first-child{*/
+/*        margin-left: 10px;*/
+/*    }*/
+/*}*/
 .range-slider {
-    margin-top: 30vh;
+    margin-top: 2vh;
 
 }
 .rs-range {

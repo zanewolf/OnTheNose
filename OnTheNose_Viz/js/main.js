@@ -27,6 +27,9 @@ Promise.all(promises)
                 d.DateFormatted= timeFormatter(d.DateObject)
                 d.Month=monthFormatter(d.DateObject)
                 d.Year=yearFormatter(d.DateObject)
+                d.numPartner = d['Num. Partners']
+                d.Partners=[d['Partner 1'], d['Partner 2'],d['Partner 3'],d['Partner 4'],d['Partner 5'],d['Partner 6']].filter(Boolean).join(", ")
+                // console.log(d.Partners)
 
                 let res = d.Time.split(":")
                 d.HoursRounded = parseFloat((Math.round((parseFloat(res[0])*3600+parseFloat(res[1])*60+parseFloat(res[2]))/3600*10)/10).toFixed(1));
@@ -49,6 +52,6 @@ function createVis(data){
 
 function updateSelectedGroup(){
     // console.log(data2[$('#rs-range-line').val()])
-    clusterVis.wrangleData(data2[$('#rs-range-line').val()])
+    clusterVis.plotBubbles(data2[$('#rs-range-line').val()])
 
 }

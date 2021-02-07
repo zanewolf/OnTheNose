@@ -26,12 +26,17 @@
 		 WHEN SUBMITTING, WE ALWAYS EXPECT CLEAR SEPARATION OF HTML, CSS, AND JS INTO THE PROPER FILES -->
 	<body style="padding: 5vh">
 	<div class="container-fluid" >
-		<div class="row justify-content-center" style="height: 12vh;">
+		<div class="row justify-content-center" style="height: 7vh;">
 			<div class="align-self-center">
-				<h1>On The Nose</h1>
+				<h1>ON THE NOSE</h1>
 			</div>
 		</div>
-        <div class = "row" style="height: 10vh">
+        <div class="row" style="height: 60vh;margin:5vh 0 1vh 0 ">
+            <div class = "col justify-content-center" id = "bubble-vis">
+            </div>
+
+        </div>
+        <div class = "row" style="height: 5vh; margin:0 0 5vh 0 ">
 <!--            <button type="button" id="groupButton" class="btn btn-primary" onClick="updateSelectedGroup()">Primary</button>-->
 <!--            <div class="row align-items-center">-->
 <!--                <div class="col-4"><p id="value-step"></p></div>-->
@@ -41,13 +46,13 @@
                 <div class="range-slider" id = "groupSelector" onChange="updateSelectedGroup()">
                     <span id="rs-bullet" class="rs-label">All</span>
                     <input id="rs-range-line" class="rs-range" type="range" step="1" value="0" min="0" max="4" >
-                    <div class="sliderticks">
-                        <p></p>
-                        <p></p>
-                        <p></p>
-                        <p></p>
-                        <p></p>
-                    </div>
+<!--                    <div class="sliderticks">-->
+<!--                        <p></p>-->
+<!--                        <p></p>-->
+<!--                        <p></p>-->
+<!--                        <p></p>-->
+<!--                        <p></p>-->
+<!--                    </div>-->
 
                 </div>
 
@@ -57,11 +62,7 @@
             </div>
 
         </div>
-<!--		<div class="row" style="height: 20vh; background: #9b3030">-->
-<!--			<div class = "col justify-content-center" id = "bubble-vis">-->
-<!--                </div>-->
 
-<!--		</div>-->
 
 	</div>
 
@@ -120,7 +121,7 @@
         function showSliderValue() {
             rangeBullet.innerHTML = data2[rangeSlider.value];
             var bulletPosition = (rangeSlider.value /rangeSlider.max);
-            rangeBullet.style.left = (bulletPosition * 550) + "px";
+            rangeBullet.style.left = (bulletPosition * 500) + "px";
             rangeBullet.style.width=data2[rangeSlider.value].length*30+"px";
         }
 
