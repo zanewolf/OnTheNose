@@ -62,6 +62,35 @@ class BubbleChart {
 
         }
 
+        vis.yearCoords = {
+            '1989' : {x: vis.width/8, y: 3*vis.height/16},
+            '1990' : {x: vis.width/8, y: 5*vis.height/16},
+            '1991' : {x: vis.width/8, y: vis.height/2},
+            '1992' : {x: vis.width/8, y: 3*vis.height/4},
+            '1993' : {x: 3*vis.width/16, y: 7*vis.height/8},
+            '1994' : {x: 9*vis.width/32, y: 3*vis.height/4},
+            '1995' : {x:  9*vis.width/32, y: vis.height/2},
+            '1996' : {x:  9*vis.width/32, y: 3*vis.height/8},
+            '1997' : {x: 21*vis.width/64, y: 3*vis.height/16},
+            '1998' : {x: 3*vis.width/8, y: 5*vis.height/16},
+            '1999' : {x: 3*vis.width/8, y: vis.height/2},
+            '2000' : {x: 3*vis.width/8, y: 11*vis.height/16},
+            '2001' : {x: 15*vis.width/32, y: 13*vis.height/16},
+            '2002' : {x: vis.width/2, y: 5*vis.height/8},
+            '2003' : {x: vis.width/2, y: 3*vis.height/8},
+            '2004' : {x: vis.width/2, y: 3*vis.height/16},
+            '2005' : {x: 9*vis.width/16, y: vis.height/8},
+            '2006' : {x: 5*vis.width/8, y: vis.height/4},
+            '2007' : {x: 5*vis.width/8, y:7*vis.height/16},
+            '2008' : {x: 5*vis.width/8, y: 5*vis.height/8},
+            '2009' : {x: 5*vis.width/8, y: 27*vis.height/32},
+            '2010' : {x: 23*vis.width/32, y: 7*vis.height/8},
+            '2011' : {x: 25*vis.width/32, y: 3*vis.height/4},
+            '2012' : {x: 25*vis.width/32, y: vis.height/2},
+            '2013' : {x: 25*vis.width/32, y: 5*vis.height/16},
+            '2014' : {x: 27*vis.width/32, y: vis.height/4},
+            '2015' : {x: 29*vis.width/32, y: 3*vis.height/8}
+        }
 
 
 
@@ -143,6 +172,7 @@ class BubbleChart {
                      <div style="border: thin solid grey; border-radius: 5px; background: darkgray; padding: 20px">
                          <p> <strong>Total Time: </strong>${d.actual_time}</p>
                          <p> <strong> Partners: </strong> ${d.partners}</p>
+                         <p> <strong> Year </strong> ${d.year}</p>
 
                      </div>`)
             })
@@ -176,7 +206,7 @@ class BubbleChart {
 
             } else if (vis.selectedGroup=="Year"){
                 // splitbyYear()
-                plottingFunction = vis.centerBubbles
+                plottingFunction = vis.yearBubbles
 
             } else if (vis.selectedGroup=="Month") {
                 // splitbyMonth()
@@ -260,7 +290,13 @@ class BubbleChart {
          }
      }
 
-     splitByYear(d,vis){
+     yearBubbles(d,vis, coord){
+        console.log(d.year)
+         if (coord=='x'){
+             return vis.yearCoords[d.year].x
+         } else {
+             return vis.yearCoords[d.year].y
+         }
 
      }
 
