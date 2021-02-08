@@ -1,6 +1,6 @@
 let bubbleVis, clusterVis;
 
-let timeParser = d3.timeParse("%m/%Y")
+let timeParser = d3.timeParse("%m/%d/%Y")
 let timeParser2= d3.timeParse("%m/%d/%Y")
 let timeFormatter = d3.timeFormat("%m/%d/%Y")
 let monthFormatter = d3.timeFormat("%B")
@@ -21,10 +21,13 @@ Promise.all(promises)
                 // convert d.Date to actual date object first
                 if (d["Date-Full"]===""){
                     d.DateObject = timeParser(d.Date)
+                    // console.log(d.Date,d.DateObject)
                 } else {
                     d.DateObject = timeParser2(d["Date-Full"])
+                    // console.log(d["Date-Full"],d.DateObject)
                 }
                 d.DateFormatted= timeFormatter(d.DateObject)
+                // console.log(d.DateFormatted)
                 d.Month=monthFormatter(d.DateObject)
                 d.Year=yearFormatter(d.DateObject)
                 d.numPartner = d['Num. Partners']
@@ -36,6 +39,8 @@ Promise.all(promises)
                 // console.log(d)
 
         })
+
+        console.log(d3.group(data[0], d=>d.Month))
 
         // need to convert the Time column into something more meaningful than a string
 

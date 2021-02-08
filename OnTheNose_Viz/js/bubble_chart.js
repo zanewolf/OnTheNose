@@ -21,7 +21,7 @@ class BubbleChart {
         let vis = this;
 
         //set up svg area
-        vis.margin = {top: 10, right: 10, bottom: 10, left: 10};
+        vis.margin = {top: 10, right: 10, bottom: 0, left: 0};
         vis.width = $("#" + vis.parentElement).width() - vis.margin.left - vis.margin.right;
         vis.height = $("#" + vis.parentElement).height() - vis.margin.top - vis.margin.bottom;
 
@@ -34,6 +34,39 @@ class BubbleChart {
             // .attr('transform', `translate (${vis.width / 2}, ${vis.height / 2})`);
         // commented transform out because it was throwing off all the position calculations
 
+        // need to create array positions for years, months, and partners. WITHOUT MAGIC NUMBERS
+        // partners will need 7. 0-6.
+        // hey, 7 months (May - Nov). Use the same coordinates
+        vis.partnerCoords = {
+            0: {x: vis.width/3, y: vis.height/4},
+            1: {x: vis.width/2, y: vis.height/2},
+            2: {x: 2*vis.width/3, y: vis.height/4},
+            3: {x: vis.width/6, y: vis.height/2},
+            4: {x: 5*vis.width/6, y: vis.height/2},
+            5: {x: vis.width/3, y: 3*vis.height/4},
+            6: {x: 2*vis.width/3, y: 3*vis.height/4},
+        }
+        // maybe consider coding months to 0-6 and just use the same array?? dummy.
+        // nvm
+        // there there are 8 months. Missed the Marches.
+
+        vis.monthCoords = {
+            'March': {x: vis.width/4, y: vis.height/4},
+            'May': {x: vis.width/2, y: vis.height/4},
+            'June': {x: vis.width/3, y: vis.height/2},
+            'July': {x: 3*vis.width/4, y: vis.height/4},
+            'August': {x: vis.width/4, y: 3*vis.height/4},
+            'September': {x: 2*vis.width/3, y: vis.height/2},
+            'October': {x: vis.width/2, y: 3*vis.height/4},
+            'November': {x: 3*vis.width/4, y: 3*vis.height/4}
+
+        }
+
+
+
+
+
+
         // init tooltip
         vis.tooltip = d3.select("body").append('div')
             .attr('class', "tooltip")
@@ -44,7 +77,7 @@ class BubbleChart {
         // set up scale for radius
         vis.radiusScale = d3.scalePow()
             .exponent(0.5)
-            .range([1,40])
+            .range([0.5,30])
             .domain([0, d3.max(vis.data, d=>d.HoursRounded)])
 
         // wrangle the data into the node format
@@ -143,19 +176,19 @@ class BubbleChart {
 
             } else if (vis.selectedGroup=="Year"){
                 // splitbyYear()
-                plottingFunction = centerBubbles
+                plottingFunction = vis.centerBubbles
 
             } else if (vis.selectedGroup=="Month") {
                 // splitbyMonth()
-                plottingFunction = centerBubbles
+                plottingFunction = vis.monthBubbles
 
-            } else if (vis.selectedGroup=="Partner") {
+            } else if (vis.selectedGroup=="Partners") {
                 // splitbyParnter()
-                plottingFunction = centerBubbles
+                plottingFunction = vis.partnerBubbles
 
             } else if (vis.selectedGroup=="Records") {
                 // splitbyRecord()
-                plottingFunction = vis.splitByRecords
+                plottingFunction = vis.recordBubbles
 
             } else {
                 console.warn("Button does not match acceptable options")
@@ -169,7 +202,8 @@ class BubbleChart {
         // only called if buttons are clicked, otherwise x,y are assigned default random values
         let vis = this;
 
-        vis.simulation.force('x', d3.forceX().strength(vis.forceStrength).x(d=>coordGenerator(d,vis)));
+        vis.simulation.force('x', d3.forceX().strength(vis.forceStrength).x(d=>coordGenerator(d,vis,'x')));
+        vis.simulation.force('y', d3.forceY().strength(vis.forceStrength).y(d=>coordGenerator(d,vis,'y')));
 
         // if (vis.selectedGroup === "All") {
         //     vis.simulation.force('x', d3.forceX().strength(vis.forceStrength).x(vis.width / 2));
@@ -186,15 +220,44 @@ class BubbleChart {
 
         // vis.updateVis()
     }
-     centerBubbles(d,vis){
-        console.log('centerbubbles',d)
+     centerBubbles(d,vis, coord){
+        // console.log('centerbubbles',d)
         // return (900/2);
-       return (vis.width/2);
+         if (coord=='x'){
+             return (vis.width/2)
+         } else {
+             return (vis.height/2)
+         }
+       // return (vis.width/2);
      }
 
-     splitByRecords(d, vis){
-        console.log('splitbyRecords',d)
-         return (d.record === 'none'? vis.width / 4 : vis.width*3/4);
+     recordBubbles(d, vis, coord){
+        // console.log('splitbyRecords',d)
+         if (coord=='x') {
+             return (d.record === 'none' ? vis.width / 4 : vis.width * 3 / 4);
+         } else {
+             return vis.height/2;
+         }
+     }
+
+    partnerBubbles(d,vis, coord){
+
+         if (coord=='x'){
+             return vis.partnerCoords[d.numPartner].x
+         } else {
+             return vis.partnerCoords[d.numPartner].y
+         }
+         // return (v
+        // return vis.partnerCoords[d.numPartner].x
+     }
+
+     monthBubbles(d,vis, coord){
+        console.log(d.month)
+         if (coord=='x'){
+             return vis.monthCoords[d.month].x
+         } else {
+             return vis.monthCoords[d.month].y
+         }
      }
 
      splitByYear(d,vis){
