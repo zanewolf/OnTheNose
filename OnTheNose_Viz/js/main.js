@@ -30,7 +30,7 @@ Promise.all(promises)
                 // console.log(d.DateFormatted)
                 d.Month=monthFormatter(d.DateObject)
                 d.Year=yearFormatter(d.DateObject)
-            console.log( d.Year)
+            // console.log( d.Year)
                 d.numPartner = d['Num. Partners']
                 d.Partners=[d['Partner 1'], d['Partner 2'],d['Partner 3'],d['Partner 4'],d['Partner 5'],d['Partner 6']].filter(Boolean).join(", ")
                 // console.log(d.Partners)

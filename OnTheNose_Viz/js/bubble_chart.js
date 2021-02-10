@@ -1,27 +1,17 @@
 class BubbleChart {
-
-
     constructor(_parentElement, data) {
         this.parentElement = _parentElement;
-        // this.legendElement = _legendElement;
         this.data = data;
         this.forceStrength = 0.03;
-        //this.practiceData = practiceData;
-        // console.log(this.data)
 
         this.initVis();
     }
-
-
-    /*
-     * Initialize visualization (static content, e.g. SVG area or axes)
-     */
 
     initVis() {
         let vis = this;
 
         //set up svg area
-        vis.margin = {top: 10, right: 10, bottom: 0, left: 0};
+        vis.margin = {top: 20, right: 10, bottom: 0, left: 0};
         vis.width = $("#" + vis.parentElement).width() - vis.margin.left - vis.margin.right;
         vis.height = $("#" + vis.parentElement).height() - vis.margin.top - vis.margin.bottom;
 
@@ -33,6 +23,10 @@ class BubbleChart {
             .append('g')
             // .attr('transform', `translate (${vis.width / 2}, ${vis.height / 2})`);
         // commented transform out because it was throwing off all the position calculations
+
+
+
+        // create the coordinate for the various arrangements. Be warned, this became quite tedious.
 
         // need to create array positions for years, months, and partners. WITHOUT MAGIC NUMBERS
         // partners will need 7. 0-6.
@@ -46,10 +40,10 @@ class BubbleChart {
             5: {x: vis.width/3, y: 3*vis.height/4},
             6: {x: 2*vis.width/3, y: 3*vis.height/4},
         }
+
         // maybe consider coding months to 0-6 and just use the same array?? dummy.
         // nvm
         // there there are 8 months. Missed the Marches.
-
         vis.monthCoords = {
             'March': {x: vis.width/4, y: vis.height/4},
             'May': {x: vis.width/2, y: vis.height/4},
@@ -62,51 +56,65 @@ class BubbleChart {
 
         }
 
+        // want to display them on a 'winding timeline', with accompanying timeline made using a cubic bezier curve command. This is gonna get....tedious. Yes, I drew it out and hand-plotted things down to the 64ths. It all had to fit.
         vis.yearCoords = {
-            '1989' : {x: vis.width/8, y: 3*vis.height/16},
-            '1990' : {x: vis.width/8, y: 5*vis.height/16},
-            '1991' : {x: vis.width/8, y: vis.height/2},
-            '1992' : {x: vis.width/8, y: 3*vis.height/4},
-            '1993' : {x: 3*vis.width/16, y: 7*vis.height/8},
-            '1994' : {x: 9*vis.width/32, y: 3*vis.height/4},
-            '1995' : {x:  9*vis.width/32, y: vis.height/2},
-            '1996' : {x:  9*vis.width/32, y: 3*vis.height/8},
-            '1997' : {x: 21*vis.width/64, y: 3*vis.height/16},
-            '1998' : {x: 3*vis.width/8, y: 5*vis.height/16},
-            '1999' : {x: 3*vis.width/8, y: vis.height/2},
-            '2000' : {x: 3*vis.width/8, y: 11*vis.height/16},
-            '2001' : {x: 15*vis.width/32, y: 13*vis.height/16},
-            '2002' : {x: vis.width/2, y: 5*vis.height/8},
-            '2003' : {x: vis.width/2, y: 3*vis.height/8},
-            '2004' : {x: vis.width/2, y: 3*vis.height/16},
-            '2005' : {x: 9*vis.width/16, y: vis.height/8},
-            '2006' : {x: 5*vis.width/8, y: vis.height/4},
-            '2007' : {x: 5*vis.width/8, y:7*vis.height/16},
-            '2008' : {x: 5*vis.width/8, y: 5*vis.height/8},
-            '2009' : {x: 5*vis.width/8, y: 27*vis.height/32},
-            '2010' : {x: 23*vis.width/32, y: 7*vis.height/8},
-            '2011' : {x: 25*vis.width/32, y: 3*vis.height/4},
-            '2012' : {x: 25*vis.width/32, y: vis.height/2},
-            '2013' : {x: 25*vis.width/32, y: 5*vis.height/16},
-            '2014' : {x: 27*vis.width/32, y: vis.height/4},
-            '2015' : {x: 29*vis.width/32, y: 3*vis.height/8}
+            '1989' : {x: 8*vis.width/64, y: 12*vis.height/64},
+            '1990' : {x: 8*vis.width/64, y: 20*vis.height/64},
+            '1991' : {x: 8*vis.width/64, y: 32*vis.height/64},
+            '1992' : {x: 8*vis.width/64, y: 44*vis.height/64},
+            '1993' : {x: 12*vis.width/64, y: 56*vis.height/64},
+            '1994' : {x: 16*vis.width/64, y: 48*vis.height/64},
+            '1995' : {x: 16*vis.width/64, y: 36*vis.height/64},
+            '1996' : {x: 16*vis.width/64, y: 24*vis.height/64},
+            '1997' : {x: 20*vis.width/64, y: 12*vis.height/64},
+            '1998' : {x: 24*vis.width/64, y: 20*vis.height/64},
+            '1999' : {x: 24*vis.width/64, y: 32*vis.height/64},
+            '2000' : {x: 24*vis.width/64, y: 44*vis.height/64},
+            '2001' : {x: 28*vis.width/64, y: 56*vis.height/64},
+            '2002' : {x: 32*vis.width/64, y: 45*vis.height/64},
+            '2003' : {x: 32*vis.width/64, y: 30*vis.height/64},
+            '2004' : {x: 32*vis.width/64, y: 20*vis.height/64},
+            '2005' : {x: 36*vis.width/64, y: 12*vis.height/64},
+            '2006' : {x: 40*vis.width/64, y: 24*vis.height/64},
+            '2007' : {x: 40*vis.width/64, y: 32*vis.height/64},
+            '2008' : {x: 40*vis.width/64, y: 43*vis.height/64},
+            '2009' : {x: 44*vis.width/64, y: 56*vis.height/64},
+            '2010' : {x: 48*vis.width/64, y: 48*vis.height/64},
+            '2011' : {x: 48*vis.width/64, y: 36*vis.height/64},
+            '2012' : {x: 48*vis.width/64, y: 24*vis.height/64},
+            '2013' : {x: 52*vis.width/64, y: 12*vis.height/64},
+            '2014' : {x: 56*vis.width/64, y: 20*vis.height/64},
+            '2015' : {x: 56*vis.width/64, y: 32*vis.height/64}
         }
 
+        // vis.timeScale = d3.scaleTime()
+        //     .range(vis.width/8, 7/8*vis.width)
+        //     .domain()
 
+        vis.x = d3.scaleLinear().range([vis.width/8, 7/8*vis.width])
 
+        vis.xTimeAxis = d3.axisBottom()
+            .scale(vis.x)
+            .tickFormat(d3.timeFormat("%Y"))
 
+        // going to start this off trying to draw only four bits of the curve, from peak to peak.
+        // vis.timelineCoords = {
+        //     0 : {x: 8*vis.width/64, y: 12*vis.height/64}, //89
+        //     1 : {x: 21*vis.width/64, y: 12*vis.height/64}, //97
+        //     2 : {x: 34*vis.width/64, y: 3*vis.height/64}, //05- a bit to the left
+        //     3 : {x: 54*vis.width/64, y: 12*vis.height/64}, //13
+        //     4:  {x: 58*vis.width/64, y: 40*vis.height/64} //stopping point just beyond 2015.
+        // }
 
         // init tooltip
         vis.tooltip = d3.select("body").append('div')
             .attr('class', "tooltip")
             .attr('id', 'tooltip');
 
-
-
         // set up scale for radius
         vis.radiusScale = d3.scalePow()
             .exponent(0.5)
-            .range([0.5,30])
+            .range([1,32])
             .domain([0, d3.max(vis.data, d=>d.HoursRounded)])
 
         // wrangle the data into the node format
@@ -126,8 +134,6 @@ class BubbleChart {
                 .attr('cy', function (d) { return d.y; });
         }
 
-
-
         vis.simulation = d3.forceSimulation()
             .velocityDecay(0.2)
             .force('x', d3.forceX().strength(vis.forceStrength).x(vis.width/2))
@@ -138,17 +144,13 @@ class BubbleChart {
         //
         vis.simulation.nodes(vis.nodes);
 
-        // let myvar= "Alll";
-
-        // vis.plotBubbles(vis.centerBubbles);
-
         vis.plotMaster("All")
     }
 
     createCircles(){
         let vis = this;
 
-        console.log(vis.nodes)
+        // console.log(vis.nodes)
 
         vis.svg.selectAll("circle")
             .data(vis.nodes)
@@ -196,28 +198,31 @@ class BubbleChart {
 
     plotMaster(selectedGroup){
         let vis = this;
+
+        vis.timeline=false;
         let plottingFunction;
         vis.selectedGroup = selectedGroup;
 
         if (vis.selectedGroup=="All"){
-                // centerBubbles()
                 // addOverviewFacts()
                 plottingFunction = vis.centerBubbles
 
             } else if (vis.selectedGroup=="Year"){
-                // splitbyYear()
+
                 plottingFunction = vis.yearBubbles
+                vis.timeline = true;
+                // vis.plotTimeline(vis)
 
             } else if (vis.selectedGroup=="Month") {
-                // splitbyMonth()
+
                 plottingFunction = vis.monthBubbles
 
             } else if (vis.selectedGroup=="Partners") {
-                // splitbyParnter()
+
                 plottingFunction = vis.partnerBubbles
 
             } else if (vis.selectedGroup=="Records") {
-                // splitbyRecord()
+
                 plottingFunction = vis.recordBubbles
 
             } else {
@@ -225,6 +230,13 @@ class BubbleChart {
             }
 
         vis.plotBubbles(plottingFunction)
+
+        if (vis.timeline == true){
+            vis.plotTimeline(vis)
+        } else {
+            vis.svg.selectAll('.timeline').remove()
+            // vis.timelinePlot.exit().remove()
+        }
 
     }
 
@@ -250,7 +262,8 @@ class BubbleChart {
 
         // vis.updateVis()
     }
-     centerBubbles(d,vis, coord){
+
+    centerBubbles(d,vis, coord){
         // console.log('centerbubbles',d)
         // return (900/2);
          if (coord=='x'){
@@ -260,8 +273,7 @@ class BubbleChart {
          }
        // return (vis.width/2);
      }
-
-     recordBubbles(d, vis, coord){
+    recordBubbles(d, vis, coord){
         // console.log('splitbyRecords',d)
          if (coord=='x') {
              return (d.record === 'none' ? vis.width / 4 : vis.width * 3 / 4);
@@ -269,7 +281,6 @@ class BubbleChart {
              return vis.height/2;
          }
      }
-
     partnerBubbles(d,vis, coord){
 
          if (coord=='x'){
@@ -280,40 +291,95 @@ class BubbleChart {
          // return (v
         // return vis.partnerCoords[d.numPartner].x
      }
-
-     monthBubbles(d,vis, coord){
-        console.log(d.month)
+    monthBubbles(d,vis, coord){
+        // console.log(d.month)
          if (coord=='x'){
              return vis.monthCoords[d.month].x
          } else {
              return vis.monthCoords[d.month].y
          }
      }
-
-     yearBubbles(d,vis, coord){
-        console.log(d.year)
+    yearBubbles(d,vis, coord){
          if (coord=='x'){
              return vis.yearCoords[d.year].x
          } else {
              return vis.yearCoords[d.year].y
          }
+    }
 
-     }
-
-     splitByPartner(d,vis){
-
-     }
-     splitByMonth(d,vis){
-
-     }
-
-    updateVis(){
-        let vis = this;
-
-        // vis.createBubbles()
-        // vis.addForceLayout()
+    yearBubbles2(d,vis,coord){
+        if (coord=='x'){
+            return vis.x[d]
+        } else {
+            return vis.height/2
+        }
 
     }
+
+    plotTimeline(vis){
+        console.log('timeline')
+        vis.svg.append('g')
+            .attr("class", "x.axis")
+            .attr("transform", "translate(0,"+vis.height/2.1+")")
+            .call(vis.xTimeAxis.ticks(null).tickSize(0))
+
+        // set up timeline group
+        // vis.timelinePlot = vis.svg
+        //     .append('g')
+        //     .attr('class', 'timeline')
+        //     .attr('id', 'yearTimeline')
+
+            // .attr('transform', `translate (${vis.width / 2}, ${vis.height / 2})`);
+
+        // // Creating a path
+        // vis.timelinePlots = vis.timelinePlot
+        //     .attr('class', 'lineSections')
+        //
+        // vis.timelineCoords = {
+        //     0 : {x: 8*vis.width/64, y: 12*vis.height/64}, //89
+        //     1 : {x: 21*vis.width/64, y: 12*vis.height/64}, //97
+        //     2 : {x: 34*vis.width/64, y: 3*vis.height/64}, //05- a bit to the left
+        //     3 : {x: 54*vis.width/64, y: 12*vis.height/64}, //13
+        //     4:  {x: 58*vis.width/64, y: 40*vis.height/64} //stopping point just beyond 2015.
+        // }
+        // vis.timelinePlot
+            // .datum(vis.timelineCoords)
+            // .append('path')
+            // .attr('class', 'timelineLine')
+            // .attr('stroke', 'black')
+            // .attr('fill', 'none')
+            // .attr('d', function(d,i){
+            //     console.log('line generator')
+                // console.log(vis.width/8, d[i].x)
+
+                // 1: 8/64*vis.width, 12/64*vis.height
+                //c1: 8/64*vis.width, 56/64*vis.height
+                // 2: (21-12)/2/64*vis.width, ((56-12)/2/64+12/64)*vis.height
+                //c2: (21-12)/2/64*vis.width, 56/64*vis.height
+                // 3: (30-21)/2/64*vis.width, ((56-12)/2/64+12/64)*vis.height
+                //c3: (30-21)/2/64*vis.width, 12/64*vis.height
+                // 4: (36-30)/2/64*vis.width, ((56-12)/2/64+12/64)*vis.height
+                //c4: (36-30)/2/64*vis.width, 12/64*vis.height
+                // 5: (44-36)/2/64*vis.width, ((56-12)/2/64+12/64)*vis.height
+                //c5: (44-36)/2/64*vis.width, 56/64*vis.height
+                // 6: (52-44)/2/64*vis.width, ((56-12)/2/64+12/64)*vis.height
+                //c6: (52-44)/2/64*vis.width, 56/64*vis.height
+                // 7: 56/64*vis.width, 32/64*vis.height
+                //c7: 56/64*vis.width, 12/64*vis.height
+
+                // return "M " + d[i].x + " " + d[i].y + " V -" + vis.height
+                // return "M 10,50 Q 25,25 40,50 t 30,0 30,0 30,0 30,0, 30,0 "
+                // return "M 0"+","+12/64*vis.height+ " Q 25,25 "+ vis.width+","+vis.height/2 //+" t 30,0 30,0 30,0 30,0, 30,0 "
+                // M [X1 Y1] C [CX1 CY1] [CX2 CY2] [X2 Y2] S [X3 Y3] [CX3 CY3] S [X4 Y4] [CX4 CY4] S ....
+                // return "M " + 8/64*vis.width + " " + 12/64*vis.height + " C " + 8/64*vis.width + " " + 54/64*vis.height+ " " + (21-12)/2/64*vis.width + " " + 56/64*vis.height + " " + (21-12)/2/64*vis.width + " " + ((56-12)/2/64+12/64)*vis.height + " S " + (30-21)/2/64*vis.width + " " + ((56-12)/2/64+12/64)*vis.height + " " + (30-21)/2/64*vis.width + " " +  12/64*vis.height + " S " + (36-30)/2/64*vis.width + " " + ((56-12)/2/64+12/64)*vis.height + " " + (36-30)/2/64*vis.width + " " + 12/64*vis.height
+                // return "M 50 50 C 50 700 300 700 300 250 S 400 50 400 500 S 500 50 500 100 S 600 150 600 0"
+                // return "M " + 6*vis.width/64 + " " + 10*vis.height/64 + " C 100 750 400 750 " + 19*vis.width/64 + " " + 10*vis.height/64
+            })
+
+        console.log(vis.timelinePlot)
+    }
+
+
 
     createNodes() {
          let vis = this;
@@ -338,13 +404,6 @@ class BubbleChart {
          })
 
         return nodes
-
-        // console.log(nodes)
     }
-
-    splitbyPartner(d){
-        console.log("here")
-    }
-
 }
 

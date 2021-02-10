@@ -35,7 +35,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../bubble_chart" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../School/Classes/Harvard/CS_171_Data_Vis/Assignments/Week 6/submission_week-06_ZaneWolf/implementation/HW" />
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
@@ -55,7 +55,7 @@
       <option name="presentableId" value="Default" />
       <updated>1611451254600</updated>
       <workItem from="1611451256575" duration="10883000" />
-      <workItem from="1612567759528" duration="44558000" />
+      <workItem from="1612567759528" duration="62401000" />
     </task>
     <servers />
   </component>
@@ -77,10 +77,10 @@
     </option>
   </component>
   <component name="WindowStateProjectService">
-    <state x="-1269" y="282" key="FileChooserDialogImpl" timestamp="1612573493896">
+    <state x="-1269" y="282" key="FileChooserDialogImpl" timestamp="1612838143038">
       <screen x="-1920" y="0" width="1855" height="1080" />
     </state>
-    <state x="-1269" y="282" key="FileChooserDialogImpl/-1920.0.1855.1080/0.0.1855.1080@-1920.0.1855.1080" timestamp="1612573493896" />
+    <state x="-1269" y="282" key="FileChooserDialogImpl/-1920.0.1855.1080/0.0.1855.1080@-1920.0.1855.1080" timestamp="1612838143038" />
     <state x="-1490" y="185" key="SettingsEditor" timestamp="1612655067596">
       <screen x="-1920" y="0" width="1855" height="1080" />
     </state>

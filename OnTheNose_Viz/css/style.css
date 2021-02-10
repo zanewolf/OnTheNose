@@ -10,10 +10,14 @@ body {
 }
 h1 {
     font-family: 'Wire One';
-    font-size: 100pt;
+    font-size: 80pt;
     font-weight: bolder;
 }
 
+#bubble-vis, .timeline {
+    height: 100%;
+    width: 100%;
+}
 .container {
     display: flex;
     flex-direction: column;
