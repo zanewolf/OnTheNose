@@ -6,12 +6,23 @@ body {
     height: 100vh;
     background-color: #000;
     font-family: 'Roboto',sans-serif;
-    background: linear-gradient(180deg, #ffffff 0%, #84fc16 100%) no-repeat;
+    background: #323235
+    /*background: linear-gradient(180deg, #2f2e2e 0%, #84fc16 100%) no-repeat;*/
 }
 h1 {
     font-family: 'Wire One';
     font-size: 80pt;
     font-weight: bolder;
+    color: white;
+}
+
+.yearLabel{
+    font-family: 'Roboto';
+    font-size: 30pt;
+    /*color: white;*/
+    /*font-weight: bolder;*/
+    stroke: white;
+    fill: white;
 }
 
 #bubble-vis, .timeline {

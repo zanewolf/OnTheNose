@@ -10,6 +10,8 @@ class BubbleChart {
     initVis() {
         let vis = this;
 
+        var notUpdated = true;
+
         //set up svg area
         vis.margin = {top: 20, right: 10, bottom: 0, left: 0};
         vis.width = $("#" + vis.parentElement).width() - vis.margin.left - vis.margin.right;
@@ -23,8 +25,6 @@ class BubbleChart {
             .append('g')
             // .attr('transform', `translate (${vis.width / 2}, ${vis.height / 2})`);
         // commented transform out because it was throwing off all the position calculations
-
-
 
         // create the coordinate for the various arrangements. Be warned, this became quite tedious.
 
@@ -87,25 +87,6 @@ class BubbleChart {
             '2015' : {x: 56*vis.width/64, y: 32*vis.height/64}
         }
 
-        // vis.timeScale = d3.scaleTime()
-        //     .range(vis.width/8, 7/8*vis.width)
-        //     .domain()
-
-        vis.x = d3.scaleLinear().range([vis.width/8, 7/8*vis.width])
-
-        vis.xTimeAxis = d3.axisBottom()
-            .scale(vis.x)
-            .tickFormat(d3.timeFormat("%Y"))
-
-        // going to start this off trying to draw only four bits of the curve, from peak to peak.
-        // vis.timelineCoords = {
-        //     0 : {x: 8*vis.width/64, y: 12*vis.height/64}, //89
-        //     1 : {x: 21*vis.width/64, y: 12*vis.height/64}, //97
-        //     2 : {x: 34*vis.width/64, y: 3*vis.height/64}, //05- a bit to the left
-        //     3 : {x: 54*vis.width/64, y: 12*vis.height/64}, //13
-        //     4:  {x: 58*vis.width/64, y: 40*vis.height/64} //stopping point just beyond 2015.
-        // }
-
         // init tooltip
         vis.tooltip = d3.select("body").append('div')
             .attr('class', "tooltip")
@@ -118,10 +99,30 @@ class BubbleChart {
             .domain([0, d3.max(vis.data, d=>d.HoursRounded)])
 
         // wrangle the data into the node format
+
+
+        vis.xYears = d3.scaleTime()
+            .range([vis.width/8, 7*vis.width/8])
+            // .domain([1989, 2015])
+            .domain(d3.extent(vis.data, d=>d.Year))
+
+        vis.colorYears = d3.scaleSequential()
+            // .domain(1,10)
+            .domain(d3.extent(vis.data, d=>d.Year))
+            .interpolator(d3.interpolateCool);
+
         vis.nodes=vis.createNodes()
 
+        console.log( vis.colorYears(1995))
+        // svg.selectAll(".secondrow").data(data).enter().append("circle").attr("cx", function(d,i){return 30 + i*60}).attr("cy", 250).attr("r", 19).attr("fill", function(d){return myColor(d) })
+
+        console.log( vis.xYears(2010), vis.xYears(1990))
+
+        // vis.xTimeAxis =
+
+
         // create the initial circles with no grouping
-        vis.createCircles()
+        vis.createBubbles()
 
         function charge(d) {
             return -Math.pow(d.scaled_radius, 2.0) * vis.forceStrength;
@@ -137,17 +138,17 @@ class BubbleChart {
         vis.simulation = d3.forceSimulation()
             .velocityDecay(0.2)
             .force('x', d3.forceX().strength(vis.forceStrength).x(vis.width/2))
-            .force('y', d3.forceY().strength(vis.forceStrength).y(vis.height/1.8))
+            .force('y', d3.forceY().strength(vis.forceStrength).y(vis.height/2))
             .force('charge', d3.forceManyBody().strength(charge))
             .on('tick', ticked);
         vis.simulation.stop();
         //
         vis.simulation.nodes(vis.nodes);
 
-        vis.plotMaster("All")
+        vis.plotMaster("All", notUpdated)
     }
 
-    createCircles(){
+    createBubbles(){
         let vis = this;
 
         // console.log(vis.nodes)
@@ -160,9 +161,10 @@ class BubbleChart {
             .attr('cx', function (d) { return d.x; })
             .attr('cy', function (d) { return d.y; })
             .attr("r", 0)
-            .attr("stroke", "black")
-            .attr("opacity", 1)
-            .attr("fill", d=>d.color_fill)
+            .attr("stroke", d=>d.stroke_fill)
+            .attr("stroke-width", d=> d.record == 'none'? 1 : 3)
+            .attr("opacity", d=> d.record == 'none'?0.7  : 1)
+            .attr("fill", "blue")
             .on("mouseover", (event,d)=>{
                 // console.log(d)
                 vis.tooltip
@@ -196,12 +198,30 @@ class BubbleChart {
 
     }
 
-    plotMaster(selectedGroup){
+    updateBubbleColor(vis,colorSelector){
+        vis.bubbles
+            // .enter()
+            .attr('fill', d=>d[colorSelector])
+            // .merge(vis.bubbles)
+            .transition()
+            .duration(1000)
+
+    }
+
+    plotMaster(selectedGroup, notUpdated){
+
+        if (notUpdated == true){
+            console.log( 'first render')
+        } else {
+            console.log('rerendered')
+        }
         let vis = this;
 
         vis.timeline=false;
         let plottingFunction;
         vis.selectedGroup = selectedGroup;
+        vis.colorSelector=''
+
 
         if (vis.selectedGroup=="All"){
                 // addOverviewFacts()
@@ -209,8 +229,12 @@ class BubbleChart {
 
             } else if (vis.selectedGroup=="Year"){
 
-                plottingFunction = vis.yearBubbles
-                vis.timeline = true;
+                plottingFunction = vis.yearBubbles2
+                vis.yearLabels(vis)
+                vis.colorSelector='color_year'
+                vis.updateBubbleColor(vis, 'color_year')
+
+                // vis.timeline = true;
                 // vis.plotTimeline(vis)
 
             } else if (vis.selectedGroup=="Month") {
@@ -229,10 +253,15 @@ class BubbleChart {
                 console.warn("Button does not match acceptable options")
             }
 
+
         vis.plotBubbles(plottingFunction)
 
+
         if (vis.timeline == true){
+
             vis.plotTimeline(vis)
+
+
         } else {
             vis.svg.selectAll('.timeline').remove()
             // vis.timelinePlot.exit().remove()
@@ -308,91 +337,52 @@ class BubbleChart {
     }
 
     yearBubbles2(d,vis,coord){
+        // console.log(d.year)
         if (coord=='x'){
-            return vis.x[d]
+            return vis.xYears(d.year)
         } else {
             return vis.height/2
         }
 
     }
 
-    plotTimeline(vis){
-        console.log('timeline')
+    yearLabels(vis){
+
         vis.svg.append('g')
-            .attr("class", "x.axis")
-            .attr("transform", "translate(0,"+vis.height/2.1+")")
-            .call(vis.xTimeAxis.ticks(null).tickSize(0))
+            .attr('class', 'yearLabel')
+            .attr('id', 'year0Label')
+            .attr("transform", "translate("+vis.width/32+","+vis.height/2+")")
+            .append('text')
+            .attr("transform", "rotate(-90)")
+            .style('text-anchor', 'middle')
+            .text(1989)
 
-        // set up timeline group
-        // vis.timelinePlot = vis.svg
-        //     .append('g')
-        //     .attr('class', 'timeline')
-        //     .attr('id', 'yearTimeline')
-
-            // .attr('transform', `translate (${vis.width / 2}, ${vis.height / 2})`);
-
-        // // Creating a path
-        // vis.timelinePlots = vis.timelinePlot
-        //     .attr('class', 'lineSections')
-        //
-        // vis.timelineCoords = {
-        //     0 : {x: 8*vis.width/64, y: 12*vis.height/64}, //89
-        //     1 : {x: 21*vis.width/64, y: 12*vis.height/64}, //97
-        //     2 : {x: 34*vis.width/64, y: 3*vis.height/64}, //05- a bit to the left
-        //     3 : {x: 54*vis.width/64, y: 12*vis.height/64}, //13
-        //     4:  {x: 58*vis.width/64, y: 40*vis.height/64} //stopping point just beyond 2015.
-        // }
-        // vis.timelinePlot
-            // .datum(vis.timelineCoords)
-            // .append('path')
-            // .attr('class', 'timelineLine')
-            // .attr('stroke', 'black')
-            // .attr('fill', 'none')
-            // .attr('d', function(d,i){
-            //     console.log('line generator')
-                // console.log(vis.width/8, d[i].x)
-
-                // 1: 8/64*vis.width, 12/64*vis.height
-                //c1: 8/64*vis.width, 56/64*vis.height
-                // 2: (21-12)/2/64*vis.width, ((56-12)/2/64+12/64)*vis.height
-                //c2: (21-12)/2/64*vis.width, 56/64*vis.height
-                // 3: (30-21)/2/64*vis.width, ((56-12)/2/64+12/64)*vis.height
-                //c3: (30-21)/2/64*vis.width, 12/64*vis.height
-                // 4: (36-30)/2/64*vis.width, ((56-12)/2/64+12/64)*vis.height
-                //c4: (36-30)/2/64*vis.width, 12/64*vis.height
-                // 5: (44-36)/2/64*vis.width, ((56-12)/2/64+12/64)*vis.height
-                //c5: (44-36)/2/64*vis.width, 56/64*vis.height
-                // 6: (52-44)/2/64*vis.width, ((56-12)/2/64+12/64)*vis.height
-                //c6: (52-44)/2/64*vis.width, 56/64*vis.height
-                // 7: 56/64*vis.width, 32/64*vis.height
-                //c7: 56/64*vis.width, 12/64*vis.height
-
-                // return "M " + d[i].x + " " + d[i].y + " V -" + vis.height
-                // return "M 10,50 Q 25,25 40,50 t 30,0 30,0 30,0 30,0, 30,0 "
-                // return "M 0"+","+12/64*vis.height+ " Q 25,25 "+ vis.width+","+vis.height/2 //+" t 30,0 30,0 30,0 30,0, 30,0 "
-                // M [X1 Y1] C [CX1 CY1] [CX2 CY2] [X2 Y2] S [X3 Y3] [CX3 CY3] S [X4 Y4] [CX4 CY4] S ....
-                // return "M " + 8/64*vis.width + " " + 12/64*vis.height + " C " + 8/64*vis.width + " " + 54/64*vis.height+ " " + (21-12)/2/64*vis.width + " " + 56/64*vis.height + " " + (21-12)/2/64*vis.width + " " + ((56-12)/2/64+12/64)*vis.height + " S " + (30-21)/2/64*vis.width + " " + ((56-12)/2/64+12/64)*vis.height + " " + (30-21)/2/64*vis.width + " " +  12/64*vis.height + " S " + (36-30)/2/64*vis.width + " " + ((56-12)/2/64+12/64)*vis.height + " " + (36-30)/2/64*vis.width + " " + 12/64*vis.height
-                // return "M 50 50 C 50 700 300 700 300 250 S 400 50 400 500 S 500 50 500 100 S 600 150 600 0"
-                // return "M " + 6*vis.width/64 + " " + 10*vis.height/64 + " C 100 750 400 750 " + 19*vis.width/64 + " " + 10*vis.height/64
-            })
-
-        console.log(vis.timelinePlot)
+        vis.svg.append('g')
+            .attr('class', 'yearLabel')
+            .attr('id', 'year1Label')
+            // .attr("transform", "translate("+31*vis.width/32+","+vis.height/2+")")
+            .append('text')
+            .attr("transform", "translate("+31*vis.width/32+","+vis.height/2+") rotate(90)")
+            .style('text-anchor', 'middle')
+            .text(2015)
     }
-
-
 
     createNodes() {
          let vis = this;
 
+         // console.log( vis.colorYears(1995))
+
+
          let nodes = []
          vis.data.forEach((d,i)=> {
-             // console.log(d)
+                        // console.log(d, d.Year, vis.colorYears(d.Year))
              nodes.push({
                  id: i,
                  scaled_radius: vis.radiusScale(d.HoursRounded),
                  rounded_time: d.HoursRounded,
                  actual_time: d.Time,
-                 color_fill: d.Record===''? 'white' : 'black',
+                 stroke_fill: d.Record===''? 'grey' : 'black',
+                 color_year: vis.colorYears(d.Year),
                  year: d.Year,
                  month: d.Month,
                  numPartner: d.numPartner,
@@ -402,6 +392,12 @@ class BubbleChart {
                  y: Math.random()*500
              })
          })
+
+        // sort nodes
+        // console.log( nodes)
+        // nodes.sort((a,b)=>b.record - b.record)
+        // console.log(nodes)
+
 
         return nodes
     }

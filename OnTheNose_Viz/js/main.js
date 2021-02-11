@@ -5,6 +5,7 @@ let timeParser2= d3.timeParse("%m/%d/%Y")
 let timeFormatter = d3.timeFormat("%m/%d/%Y")
 let monthFormatter = d3.timeFormat("%B")
 let yearFormatter = d3.timeFormat("%Y")
+var notUpdated = true;
 
 let promises = [
     d3.csv("data/onthenoseData.csv"),
@@ -57,6 +58,7 @@ function createVis(data){
 }
 
 function updateSelectedGroup(){
-    clusterVis.plotMaster(data2[$('#rs-range-line').val()])
+    var notUpdated = false;
+    clusterVis.plotMaster(data2[$('#rs-range-line').val()], notUpdated)
 
 }
