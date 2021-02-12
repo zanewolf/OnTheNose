@@ -13,29 +13,21 @@ let promises = [
 ]
 Promise.all(promises)
     .then( function(data){
-        // console.log(data[0]);
 
         data[0].forEach(d=>{
-            // console.log(d)
-            //     console.log(d["Date-Full"])
-
                 // convert d.Date to actual date object first
                 if (d["Date-Full"]===""){
                     d.DateObject = timeParser(d.Date)
-                    // console.log(d.Date,d.DateObject)
                 } else {
                     d.DateObject = timeParser2(d["Date-Full"])
-                    // console.log(d["Date-Full"],d.DateObject)
                 }
                 d.DateFormatted= timeFormatter(d.DateObject)
-                // console.log(d.DateFormatted)
                 d.Month=monthFormatter(d.DateObject)
                 d.Year=yearFormatter(d.DateObject)
-            // console.log( d.Year)
                 d.numPartner = d['Num. Partners']
                 d.Partners=[d['Partner 1'], d['Partner 2'],d['Partner 3'],d['Partner 4'],d['Partner 5'],d['Partner 6']].filter(Boolean).join(", ")
-                // console.log(d.Partners)
-
+                // console.log(d)
+                d.Records = d.Record ==''? 'none': d.Record
                 let res = d.Time.split(":")
                 d.HoursRounded = parseFloat((Math.round((parseFloat(res[0])*3600+parseFloat(res[1])*60+parseFloat(res[2]))/3600*10)/10).toFixed(1));
                 // console.log(d)

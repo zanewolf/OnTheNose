@@ -11,6 +11,8 @@ class BubbleChart {
         let vis = this;
 
         var notUpdated = true;
+        vis.prevLabelSelector='';
+        vis.currentLabelSelector='';
 
         //set up svg area
         vis.margin = {top: 20, right: 10, bottom: 0, left: 0};
@@ -41,16 +43,24 @@ class BubbleChart {
             6: {x: 2*vis.width/3, y: 3*vis.height/4},
         }
 
+        vis.recordCoords = {
+            'none': {x: vis.width/4, y: 3*vis.height/8},
+            'speed record': {x:4*vis.width/8, y: 5*vis.height/8},
+            'solo record':{x:4*vis.width/8, y: 3*vis.height/8},
+            'four-person team record':{x:6*vis.width/8, y: 5*vis.height/8},
+            'male-female record':{x: 6*vis.width/8, y: 3*vis.height/8}
+        }
+
         // maybe consider coding months to 0-6 and just use the same array?? dummy.
         // nvm
         // there there are 8 months. Missed the Marches.
         vis.monthCoords = {
             'March': {x: vis.width/4, y: vis.height/4},
             'May': {x: vis.width/2, y: vis.height/4},
-            'June': {x: vis.width/3, y: vis.height/2},
-            'July': {x: 3*vis.width/4, y: vis.height/4},
-            'August': {x: vis.width/4, y: 3*vis.height/4},
-            'September': {x: 2*vis.width/3, y: vis.height/2},
+            'June': {x: 3*vis.width/4, y: vis.height/4},
+            'July': {x: vis.width/3, y: vis.height/2},
+            'August': {x: 2*vis.width/3, y: vis.height/2},
+            'September': {x: vis.width/4, y: 3*vis.height/4},
             'October': {x: vis.width/2, y: 3*vis.height/4},
             'November': {x: 3*vis.width/4, y: 3*vis.height/4}
 
@@ -86,6 +96,7 @@ class BubbleChart {
             '2014' : {x: 56*vis.width/64, y: 20*vis.height/64},
             '2015' : {x: 56*vis.width/64, y: 32*vis.height/64}
         }
+        // these no longer matter but I want it KNOWN TO WHOEVER ACTUALLY READS THIS CODE, if that person exists, how much effort I put into placing those years.
 
         // init tooltip
         vis.tooltip = d3.select("body").append('div')
@@ -100,7 +111,9 @@ class BubbleChart {
 
         // wrangle the data into the node format
 
+        // Create Color Scales
 
+        // axis and color scale for the years
         vis.xYears = d3.scaleTime()
             .range([vis.width/8, 7*vis.width/8])
             // .domain([1989, 2015])
@@ -111,19 +124,28 @@ class BubbleChart {
             .domain(d3.extent(vis.data, d=>d.Year))
             .interpolator(d3.interpolateCool);
 
+        // color scale for the partners
+        vis.colorPartners = d3.scaleSequential()
+            .domain(d3.extent(vis.data, d=>d.numPartner))
+            .interpolator(d3.interpolateGnBu)
+
+
+        // color scale for the records
+        vis.colorRecords = d3.scaleOrdinal()
+            .range(["#ffffff","#06d6a0","#1b9aaa","#ef476f","#935fa7","#6f73d2"])
+            .domain(['none', 'speed record', 'male-female record', 'four-person team record', 'solo record'])
+
+        vis.colorRecords2 = d3.scaleOrdinal()
+            .range(["#fff","#6B40B7","#05b6ff","#24F375","#9EF44B"])
+            // .range(["#fff","#6B40B7","#4373E1","#00CCBD","#24F375","#9EF44B"])
+            .domain(['none','solo record', 'male-female record', 'speed record','four-person team record'])
+
+        // color scale for the months
+        // console.log( vis.colorRecords2('speed record'), vis.colorRecords2('solo record'))
+        // wrangle data
         vis.nodes=vis.createNodes()
 
-        console.log( vis.colorYears(1995))
-        // svg.selectAll(".secondrow").data(data).enter().append("circle").attr("cx", function(d,i){return 30 + i*60}).attr("cy", 250).attr("r", 19).attr("fill", function(d){return myColor(d) })
-
-        console.log( vis.xYears(2010), vis.xYears(1990))
-
-        // vis.xTimeAxis =
-
-
-        // create the initial circles with no grouping
-        vis.createBubbles()
-
+        // set up force simulation
         function charge(d) {
             return -Math.pow(d.scaled_radius, 2.0) * vis.forceStrength;
         }
@@ -141,17 +163,46 @@ class BubbleChart {
             .force('y', d3.forceY().strength(vis.forceStrength).y(vis.height/2))
             .force('charge', d3.forceManyBody().strength(charge))
             .on('tick', ticked);
+
         vis.simulation.stop();
-        //
+
         vis.simulation.nodes(vis.nodes);
 
+        // create the initial circles with no grouping
+        vis.createBubbles()
+
+        // call pipeline for applying force and rerendering bubbles
         vis.plotMaster("All", notUpdated)
+    }
+    createNodes() {
+        let vis = this;
+
+        let nodes = [];
+
+        vis.data.forEach((d,i)=> {
+            nodes.push({
+                id: i,
+                scaled_radius: vis.radiusScale(d.HoursRounded),
+                rounded_time: d.HoursRounded,
+                actual_time: d.Time,
+                stroke_fill: d.Records==='none'? 'grey' : 'black',
+                record_fill: vis.colorRecords2(d.Records),
+                color_start: 'white',
+                year: d.Year,
+                month: d.Month,
+                numPartner: d.numPartner,
+                partners: d.Partners,
+                record: d.Records,
+                x: Math.random()*900,
+                y: Math.random()*500
+            })
+        })
+
+        return nodes
     }
 
     createBubbles(){
         let vis = this;
-
-        // console.log(vis.nodes)
 
         vis.svg.selectAll("circle")
             .data(vis.nodes)
@@ -162,9 +213,9 @@ class BubbleChart {
             .attr('cy', function (d) { return d.y; })
             .attr("r", 0)
             .attr("stroke", d=>d.stroke_fill)
-            .attr("stroke-width", d=> d.record == 'none'? 1 : 3)
-            .attr("opacity", d=> d.record == 'none'?0.7  : 1)
-            .attr("fill", "blue")
+            .attr("stroke-width", d=> d.record == 'none'? 0 : 3)
+            .attr("opacity", d=> d.record == 'none'? 0.6  : 1)
+            .attr('fill', d=>d.color_start)
             .on("mouseover", (event,d)=>{
                 // console.log(d)
                 vis.tooltip
@@ -198,100 +249,107 @@ class BubbleChart {
 
     }
 
-    updateBubbleColor(vis,colorSelector){
-        vis.bubbles
-            // .enter()
-            .attr('fill', d=>d[colorSelector])
-            // .merge(vis.bubbles)
-            .transition()
-            .duration(1000)
-
-    }
-
     plotMaster(selectedGroup, notUpdated){
-
-        if (notUpdated == true){
-            console.log( 'first render')
-        } else {
-            console.log('rerendered')
-        }
-        let vis = this;
+       let vis = this;
 
         vis.timeline=false;
-        let plottingFunction;
+        let plottingFunction,labelFunction;
         vis.selectedGroup = selectedGroup;
-        vis.colorSelector=''
+        vis.colorSelector='color_start'
 
 
         if (vis.selectedGroup=="All"){
                 // addOverviewFacts()
-                plottingFunction = vis.centerBubbles
+            plottingFunction = vis.centerBubbles
+            labelFunction=vis.centerLabels
+            vis.currentLabelSelector='overview'
 
-            } else if (vis.selectedGroup=="Year"){
+        } else if (vis.selectedGroup=="Year"){
+            plottingFunction = vis.yearBubbles
+            labelFunction=vis.yearLabels
+            // vis.yearLabels(vis)
+            vis.colorSelector='record_fill'
+            vis.currentLabelSelector='year'
 
-                plottingFunction = vis.yearBubbles2
-                vis.yearLabels(vis)
-                vis.colorSelector='color_year'
-                vis.updateBubbleColor(vis, 'color_year')
+        } else if (vis.selectedGroup=="Month") {
+            plottingFunction = vis.monthBubbles
+            labelFunction=vis.monthLabels
+            vis.colorSelector = 'record_fill'
+            vis.currentLabelSelector='month'
 
-                // vis.timeline = true;
-                // vis.plotTimeline(vis)
+        } else if (vis.selectedGroup=="Partners") {
+            plottingFunction = vis.partnerBubbles
+            labelFunction=vis.partnerLabels
+            vis.colorSelector='record_fill'
+            vis.currentLabelSelector='partner'
 
-            } else if (vis.selectedGroup=="Month") {
-
-                plottingFunction = vis.monthBubbles
-
-            } else if (vis.selectedGroup=="Partners") {
-
-                plottingFunction = vis.partnerBubbles
-
-            } else if (vis.selectedGroup=="Records") {
-
-                plottingFunction = vis.recordBubbles
-
-            } else {
-                console.warn("Button does not match acceptable options")
-            }
-
-
-        vis.plotBubbles(plottingFunction)
-
-
-        if (vis.timeline == true){
-
-            vis.plotTimeline(vis)
-
+        } else if (vis.selectedGroup=="Records") {
+            plottingFunction = vis.recordBubbles
+            labelFunction=vis.recordLabels
+            vis.colorSelector='record_fill'
+            vis.currentLabelSelector='record'
 
         } else {
-            vis.svg.selectAll('.timeline').remove()
-            // vis.timelinePlot.exit().remove()
+            console.warn("Button does not match acceptable options")
+        }
+
+
+        // the bubbles will update position based on the plottingfunction passed to it
+        vis.plotBubbles(plottingFunction)
+        vis.updateLabels(vis,vis.prevLabelSelector,labelFunction)
+
+
+        vis.prevLabelSelector=vis.currentLabelSelector;
+        // vis.currentLabelSelector='';
+
+
+        // the labels will update based on the selected group
+        // vis.updateLabels(labelSelector)
+
+
+        if (notUpdated == true){
+            console.log( 'first render')
+            // have the pop up about the background displayed. Shouldn't pop up again unless page is refreshed
+            // have the overview/facts/how to read pop up - disable with toggle
+            // vis.plotAnnotations(vis)
+        } else {
+            console.log('rerendered')
+            // update the bubble color. For some reason, this command only works properly in an if statement.
+            // update the labels here??
+            vis.updateBubbleColor(vis, vis.colorSelector)
         }
 
     }
 
     plotBubbles(coordGenerator) {
-        // only called if buttons are clicked, otherwise x,y are assigned default random values
         let vis = this;
 
         vis.simulation.force('x', d3.forceX().strength(vis.forceStrength).x(d=>coordGenerator(d,vis,'x')));
         vis.simulation.force('y', d3.forceY().strength(vis.forceStrength).y(d=>coordGenerator(d,vis,'y')));
 
-        // if (vis.selectedGroup === "All") {
-        //     vis.simulation.force('x', d3.forceX().strength(vis.forceStrength).x(vis.width / 2));
-        // } else if (vis.selectedGroup==="Records"){
-        //     vis.simulation.force('x', d3.forceX().strength(vis.forceStrength).x( d=> d.record === 'none'? vis.width / 4 : vis.width*3/4));
-        //
-        // } else {
-        //     vis.simulation.force('x', d3.forceX().strength(vis.forceStrength).x(coordGenerator))
-        // }
-
         // @v4 We can reset the alpha value and restart the simulation
         vis.simulation.alpha(1).restart();
 
-
-        // vis.updateVis()
     }
 
+    // because the following group of functions are called from a nested function, it is necessary to pass them this.
+    updateBubbleColor(vis,colorSelector){
+        vis.bubbles
+            // .enter()
+            .transition()
+            .duration(1500)
+            .attr('fill', d=>d[colorSelector])
+        // .merge(vis.bubbles)
+
+
+    }
+
+    updateLabels(vis,prevLabelSelector,labelFunction){
+        console.log('current label', prevLabelSelector)
+        vis.svg.selectAll('.'+prevLabelSelector+'Label').remove();
+
+        labelFunction(vis);
+    }
     centerBubbles(d,vis, coord){
         // console.log('centerbubbles',d)
         // return (900/2);
@@ -302,24 +360,23 @@ class BubbleChart {
          }
        // return (vis.width/2);
      }
+
     recordBubbles(d, vis, coord){
-        // console.log('splitbyRecords',d)
          if (coord=='x') {
-             return (d.record === 'none' ? vis.width / 4 : vis.width * 3 / 4);
+             return vis.recordCoords[d.record].x
          } else {
-             return vis.height/2;
+             return vis.recordCoords[d.record].y
          }
      }
-    partnerBubbles(d,vis, coord){
 
+    partnerBubbles(d,vis, coord){
          if (coord=='x'){
              return vis.partnerCoords[d.numPartner].x
          } else {
              return vis.partnerCoords[d.numPartner].y
          }
-         // return (v
-        // return vis.partnerCoords[d.numPartner].x
      }
+
     monthBubbles(d,vis, coord){
         // console.log(d.month)
          if (coord=='x'){
@@ -328,26 +385,18 @@ class BubbleChart {
              return vis.monthCoords[d.month].y
          }
      }
-    yearBubbles(d,vis, coord){
-         if (coord=='x'){
-             return vis.yearCoords[d.year].x
-         } else {
-             return vis.yearCoords[d.year].y
-         }
-    }
 
-    yearBubbles2(d,vis,coord){
-        // console.log(d.year)
+    yearBubbles(d,vis, coord){
         if (coord=='x'){
             return vis.xYears(d.year)
         } else {
             return vis.height/2
         }
-
     }
 
     yearLabels(vis){
 
+        console.log('year labels')
         vis.svg.append('g')
             .attr('class', 'yearLabel')
             .attr('id', 'year0Label')
@@ -367,39 +416,167 @@ class BubbleChart {
             .text(2015)
     }
 
-    createNodes() {
-         let vis = this;
+    centerLabels(vis){
+        console.log( 'overview labels')
+    }
+    recordLabels(vis) {
+        // vis.recordCoords = {
+        //     'none': {x: vis.width/4, y: vis.height/2},
+        //     'speed record': {x:4*vis.width/8, y: 5*vis.height/8},
+        //     'solo record':{x:4*vis.width/8, y: 3*vis.height/8},
+        //     'four-person team record':{x: 6*vis.width/8, y: 5*vis.height/8},
+        //     'male-female record':{x: 6*vis.width/8, y: 3*vis.height/8}
 
-         // console.log( vis.colorYears(1995))
+        // }
+        console.log('record labels')
+        vis.svg.append('g')
+            .attr('class', 'recordLabel')
+            .attr("transform", "translate(" + 4 * vis.width / 8 + "," + 13 * vis.height / 16 + ")")
+            .append('text')
+            .style('text-anchor', 'start')
+            .text('Classic')
+
+        vis.svg.append('g')
+            .attr('class', 'recordLabel')
+            .append('text')
+            .attr("transform", "translate(" + 4 * vis.width / 8 + "," + 3 * vis.height / 16 + ")")
+            .style('text-anchor', 'start')
+            .text('Solo')
+
+        vis.svg.append('g')
+            .attr('class', 'recordLabel')
+            .append('text')
+            .attr("transform", "translate(" + 12 * vis.width / 16 + "," + 3 * vis.height / 16 + ")")
+            .style('text-anchor', 'middle')
+            .text('Male-Female')
+
+        vis.svg.append('g')
+            .attr('class', 'recordLabel')
+            .append('text')
+            .attr("transform", "translate(" + 12 * vis.width / 16 + "," + 13 * vis.height / 16 + ")")
+            .style('text-anchor', 'middle')
+            .text('4-Person')
+
+        vis.svg.append('g')
+            .attr('class', 'recordLabel')
+            .append('text')
+            .attr("transform", "translate(" +4 * vis.width / 16 + "," + 13 * vis.height / 16 + ")")
+            .style('text-anchor', 'middle')
+            .text('None')
+    }
 
 
-         let nodes = []
-         vis.data.forEach((d,i)=> {
-                        // console.log(d, d.Year, vis.colorYears(d.Year))
-             nodes.push({
-                 id: i,
-                 scaled_radius: vis.radiusScale(d.HoursRounded),
-                 rounded_time: d.HoursRounded,
-                 actual_time: d.Time,
-                 stroke_fill: d.Record===''? 'grey' : 'black',
-                 color_year: vis.colorYears(d.Year),
-                 year: d.Year,
-                 month: d.Month,
-                 numPartner: d.numPartner,
-                 partners: d.Partners,
-                 record: d.Record===''? 'none' : d.Record,
-                 x: Math.random()*900,
-                 y: Math.random()*500
-             })
-         })
+    partnerLabels(vis){
+        // console.log( 'partner labels')
 
-        // sort nodes
-        // console.log( nodes)
-        // nodes.sort((a,b)=>b.record - b.record)
-        // console.log(nodes)
+        vis.svg.append('g')
+            .attr('class', 'partnerLabel')
+            .attr("transform", "translate(" + 4 * vis.width / 16 + "," + 3.5 * vis.height / 16 + ")")
+            .append('text')
+            .style('text-anchor', 'start')
+            .text('0')
 
+        vis.svg.append('g')
+            .attr('class', 'partnerLabel')
+            .append('text')
+            .attr("transform", "translate(" + 6.25 * vis.width / 16 + "," + 8.5 * vis.height / 16 + ")")
+            .style('text-anchor', 'start')
+            .text('1')
 
-        return nodes
+        vis.svg.append('g')
+            .attr('class', 'partnerLabel')
+            .append('text')
+            .attr("transform", "translate(" + 12.5 * vis.width / 16 + "," + 4 * vis.height / 16 + ")")
+            .style('text-anchor', 'middle')
+            .text('2')
+
+        vis.svg.append('g')
+            .attr('class', 'partnerLabel')
+            .append('text')
+            .attr("transform", "translate(" + 1 * vis.width / 16 + "," + 8.5 * vis.height / 16 + ")")
+            .style('text-anchor', 'middle')
+            .text('3')
+
+        vis.svg.append('g')
+            .attr('class', 'partnerLabel')
+            .append('text')
+            .attr("transform", "translate(" +15 * vis.width / 16 + "," + 8.5 * vis.height / 16 + ")")
+            .style('text-anchor', 'middle')
+            .text('4')
+
+        vis.svg.append('g')
+            .attr('class', 'partnerLabel')
+            .append('text')
+            .attr("transform", "translate(" +4 * vis.width / 16 + "," + 13.5 * vis.height / 16 + ")")
+            .style('text-anchor', 'middle')
+            .text('5')
+
+        vis.svg.append('g')
+            .attr('class', 'partnerLabel')
+            .append('text')
+            .attr("transform", "translate(" +12.5 * vis.width / 16 + "," + 13.5 * vis.height / 16 + ")")
+            .style('text-anchor', 'middle')
+            .text('6')
+    }
+
+    monthLabels(vis){
+        // console.log( 'month labels')
+
+        vis.svg.append('g')
+            .attr('class', 'monthLabel')
+            .attr("transform", "translate(" +2* vis.width / 16 + "," + 3.5 * vis.height / 16 + ")")
+            .append('text')
+            .style('text-anchor', 'start')
+            .text('MAR')
+
+        vis.svg.append('g')
+            .attr('class', 'monthLabel')
+            .append('text')
+            .attr("transform", "translate(" + 6 * vis.width / 16 + "," + 3.5 * vis.height / 16 + ")")
+            .style('text-anchor', 'start')
+            .text('MAY')
+
+        vis.svg.append('g')
+            .attr('class', 'monthLabel')
+            .append('text')
+            .attr("transform", "translate(" + 11 * vis.width / 16 + "," + 3.5 * vis.height / 16 + ")")
+            .style('text-anchor', 'middle')
+            .text('JUN')
+
+        vis.svg.append('g')
+            .attr('class', 'monthLabel')
+            .append('text')
+            .attr("transform", "translate(" + 4 * vis.width / 16 + "," + 8.5 * vis.height / 16 + ")")
+            .style('text-anchor', 'middle')
+            .text('JUL')
+
+        vis.svg.append('g')
+            .attr('class', 'monthLabel')
+            .append('text')
+            .attr("transform", "translate(" +9.5 * vis.width / 16 + "," + 8.5 * vis.height / 16 + ")")
+            .style('text-anchor', 'middle')
+            .text('AUG')
+
+        vis.svg.append('g')
+            .attr('class', 'monthLabel')
+            .append('text')
+            .attr("transform", "translate(" +2* vis.width / 16 + "," + 13 * vis.height / 16 + ")")
+            .style('text-anchor', 'middle')
+            .text('SEP')
+
+        vis.svg.append('g')
+            .attr('class', 'monthLabel')
+            .append('text')
+            .attr("transform", "translate(" +6.5 * vis.width / 16 + "," + 13.5 * vis.height / 16 + ")")
+            .style('text-anchor', 'middle')
+            .text('OCT')
+
+        vis.svg.append('g')
+            .attr('class', 'monthLabel')
+            .append('text')
+            .attr("transform", "translate(" +11.5 * vis.width / 16 + "," + 13.5 * vis.height / 16 + ")")
+            .style('text-anchor', 'middle')
+            .text('NOV')
     }
 }
 

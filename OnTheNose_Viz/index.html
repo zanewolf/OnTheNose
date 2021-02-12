@@ -84,39 +84,10 @@
 	<!-- own js files -->
 	<script src="js/main.js"></script>
 	<script src="js/bubble_chart.js"></script>
-<!--    <script>-->
-<!--        var data = [0, 1, 2, 3, 4];-->
-<!--        var data2 = ['All', 'Year', 'Month', 'Num Partners', 'Record Setting']-->
-<!--        var sliderStep = d3-->
-<!--                .sliderBottom()-->
-<!--                .min(d3.min(data))-->
-<!--                .max(d3.max(data))-->
-<!--                .width(500)-->
-<!--                .tickFormat((d,i)=>data2[i])-->
-<!--                .ticks(5)-->
-<!--                .step(1)-->
-<!--                .default(0)-->
-<!--                .on('onchange', val => {-->
-<!--                    d3.select('p#value-step').text(data2[val]);-->
-<!--                });-->
-
-<!--        var gStep = d3-->
-<!--                .select('div#slider-step')-->
-<!--                .append('svg')-->
-<!--                .attr('width', 600)-->
-<!--                .attr('height', 100)-->
-<!--                .append('g')-->
-<!--                .attr('transform', 'translate(30,30)');-->
-
-<!--        gStep.call(sliderStep);-->
-
-<!--        d3.select('p#value-step').text(data2[sliderStep.value()]);-->
-<!--    </script>-->
-<!--	<script src="js/clusters.js"></script>-->
     <script>
         var rangeSlider = document.getElementById("rs-range-line");
         var rangeBullet = document.getElementById("rs-bullet");
-        var data2 = ['All', 'Year', 'Month', 'Partners', 'Records']
+        var data2 = ['All', 'Records','Year', 'Month', 'Partners']
 
         rangeSlider.addEventListener("input", showSliderValue, false);
 
