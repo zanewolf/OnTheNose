@@ -55,7 +55,7 @@
       <option name="presentableId" value="Default" />
       <updated>1611451254600</updated>
       <workItem from="1611451256575" duration="10883000" />
-      <workItem from="1612567759528" duration="85491000" />
+      <workItem from="1612567759528" duration="87280000" />
     </task>
     <servers />
   </component>
@@ -85,6 +85,10 @@
       <screen x="-1920" y="0" width="1855" height="1080" />
     </state>
     <state x="-1490" y="185" key="SettingsEditor/-1920.0.1855.1080/0.0.1855.1080@-1920.0.1855.1080" timestamp="1612655067596" />
+    <state x="-1354" y="154" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1613096331358">
+      <screen x="-1920" y="0" width="1857" height="1080" />
+    </state>
+    <state x="-1354" y="154" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/-1920.0.1857.1080/0.0.1857.1080@-1920.0.1857.1080" timestamp="1613096331358" />
     <state x="635" y="273" width="585" height="534" key="find.popup" timestamp="1611547097037">
       <screen x="0" y="0" width="1855" height="1080" />
     </state>

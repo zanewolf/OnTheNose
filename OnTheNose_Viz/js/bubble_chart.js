@@ -308,12 +308,12 @@ class BubbleChart {
 
 
         if (notUpdated == true){
-            console.log( 'first render')
+            // console.log( 'first render')
             // have the pop up about the background displayed. Shouldn't pop up again unless page is refreshed
             // have the overview/facts/how to read pop up - disable with toggle
             // vis.plotAnnotations(vis)
         } else {
-            console.log('rerendered')
+            // console.log('rerendered')
             // update the bubble color. For some reason, this command only works properly in an if statement.
             // update the labels here??
             vis.updateBubbleColor(vis, vis.colorSelector)
@@ -345,7 +345,7 @@ class BubbleChart {
     }
 
     updateLabels(vis,prevLabelSelector,labelFunction){
-        console.log('current label', prevLabelSelector)
+        // console.log('current label', prevLabelSelector)
         vis.svg.selectAll('.'+prevLabelSelector+'Label').remove();
 
         labelFunction(vis);
@@ -396,7 +396,7 @@ class BubbleChart {
 
     yearLabels(vis){
 
-        console.log('year labels')
+        // console.log('year labels')
         vis.svg.append('g')
             .attr('class', 'yearLabel')
             .attr('id', 'year0Label')
@@ -417,7 +417,7 @@ class BubbleChart {
     }
 
     centerLabels(vis){
-        console.log( 'overview labels')
+        // console.log( 'overview labels')
     }
     recordLabels(vis) {
         // vis.recordCoords = {
@@ -428,7 +428,7 @@ class BubbleChart {
         //     'male-female record':{x: 6*vis.width/8, y: 3*vis.height/8}
 
         // }
-        console.log('record labels')
+        // console.log('record labels')
         vis.svg.append('g')
             .attr('class', 'recordLabel')
             .attr("transform", "translate(" + 4 * vis.width / 8 + "," + 13 * vis.height / 16 + ")")

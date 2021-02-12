@@ -49,8 +49,10 @@ function createVis(data){
     clusterVis = new BubbleChart("bubble-vis", data[0])
 }
 
-function updateSelectedGroup(){
+function updateSelectedGroup(buttonVal){
+    console.log('updated', buttonVal)
     var notUpdated = false;
-    clusterVis.plotMaster(data2[$('#rs-range-line').val()], notUpdated)
+    // clusterVis.plotMaster(data2[$('#rs-range-line').val()], notUpdated)
+    clusterVis.plotMaster(buttonVal.toString(), notUpdated)
 
 }

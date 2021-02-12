@@ -42,22 +42,34 @@
 <!--                <div class="col-4"><p id="value-step"></p></div>-->
 <!--                <div class="col-8" ><div id="slider-step" onChange="updateSelectedGroup()"></div></div>-->
 <!--            </div>-->
-            <div class="container">
-                <div class="range-slider" id = "groupSelector" onChange="updateSelectedGroup()">
-                    <span id="rs-bullet" class="rs-label">All</span>
-                    <input id="rs-range-line" class="rs-range" type="range" step="1" value="0" min="0" max="4" >
-<!--                    <div class="sliderticks">-->
-<!--                        <p></p>-->
-<!--                        <p></p>-->
-<!--                        <p></p>-->
-<!--                        <p></p>-->
-<!--                        <p></p>-->
-<!--                    </div>-->
+<!--            <div class="container">-->
+<!--                <div class="range-slider" id = "groupSelector" onChange="updateSelectedGroup()">-->
+<!--                    <span id="rs-bullet" class="rs-label">All</span>-->
+<!--                    <input id="rs-range-line" class="rs-range" type="range" step="1" value="0" min="0" max="4" >-->
+<!--&lt;!&ndash;                    <div class="sliderticks">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <p></p>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <p></p>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <p></p>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <p></p>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <p></p>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
 
-                </div>
+<!--                </div>-->
 
-<!--                <div class="box-minmax">-->
-<!--                    <span>All</span><span>Year</span><span>Month</span><span>Number Partners</span><span>Record Setting</span>-->
+<!--&lt;!&ndash;                <div class="box-minmax">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <span>All</span><span>Year</span><span>Month</span><span>Number Partners</span><span>Record Setting</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--            </div>-->
+            <div class="btn-group btn-group-lg" id="aBtnGroup" role="group" aria-label="Basic example">
+                <button type="button" value="All" class="btn btn-secondary active">Overview</button>
+                <button type="button" value="Records" class="btn btn-secondary">Record</button>
+                <button type="button" value="Year" class="btn btn-secondary">Year</button>
+                <button type="button" value="Month" class="btn btn-secondary">Month</button>
+                <button type="button" value="Partners" class="btn btn-secondary">Partners</button>
+<!--                <div id="aBtnGroup" class="btn-group">-->
+<!--                    <button type="button" value="L" class="btn btn-default">Left</button>-->
+<!--                    <button type="button" value="M" class="btn btn-default">Middle</button>-->
+<!--                    <button type="button" value="R" class="btn btn-default">Right</button>-->
 <!--                </div>-->
             </div>
 
@@ -85,18 +97,36 @@
 	<script src="js/main.js"></script>
 	<script src="js/bubble_chart.js"></script>
     <script>
-        var rangeSlider = document.getElementById("rs-range-line");
-        var rangeBullet = document.getElementById("rs-bullet");
-        var data2 = ['All', 'Records','Year', 'Month', 'Partners']
+        // var rangeSlider = document.getElementById("rs-range-line");
+        // var rangeBullet = document.getElementById("rs-bullet");
+        // var data2 = ['All', 'Records','Year', 'Month', 'Partners']
+        //
+        // rangeSlider.addEventListener("input", showSliderValue, false);
+        //
+        // function showSliderValue() {
+        //     rangeBullet.innerHTML = data2[rangeSlider.value];
+        //     var bulletPosition = (rangeSlider.value /rangeSlider.max);
+        //     rangeBullet.style.left = (bulletPosition * 500) + "px";
+        //     rangeBullet.style.width=data2[rangeSlider.value].length*30+"px";
+        // }
 
-        rangeSlider.addEventListener("input", showSliderValue, false);
 
-        function showSliderValue() {
-            rangeBullet.innerHTML = data2[rangeSlider.value];
-            var bulletPosition = (rangeSlider.value /rangeSlider.max);
-            rangeBullet.style.left = (bulletPosition * 500) + "px";
-            rangeBullet.style.width=data2[rangeSlider.value].length*30+"px";
-        }
+        // $(document).ready(function() {
+        // let buttonVal='All'
+
+            // Get click event, assign button to var, and get values from that var
+            $('#aBtnGroup button').on('click', function() {
+                var thisBtn = $(this);
+
+                thisBtn.addClass('active').siblings().removeClass('active');
+                var btnText = thisBtn.text();
+                var btnValue = thisBtn.val();
+                console.log(btnText + ' - ' + btnValue);
+                //
+                // $('#selectedVal').text(btnValue);
+                updateSelectedGroup(thisBtn.val())
+            });
+
 
     </script>
 	</body>
