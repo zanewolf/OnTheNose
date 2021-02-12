@@ -6,6 +6,7 @@ let timeFormatter = d3.timeFormat("%m/%d/%Y")
 let monthFormatter = d3.timeFormat("%B")
 let yearFormatter = d3.timeFormat("%Y")
 var notUpdated = true;
+var labelToggle=true;
 
 let promises = [
     d3.csv("data/onthenoseData.csv"),
@@ -55,4 +56,8 @@ function updateSelectedGroup(buttonVal){
     // clusterVis.plotMaster(data2[$('#rs-range-line').val()], notUpdated)
     clusterVis.plotMaster(buttonVal.toString(), notUpdated)
 
+}
+
+function toggleLabel(){
+    $('.label').toggle();
 }

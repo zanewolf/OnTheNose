@@ -20,57 +20,29 @@
 		<!-- GOOGLE FONTS -->
 		<link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,500,400italic,300italic' rel='stylesheet' type='text/css'>
 	</head>
-
-	<!-- SOME SAMPLE HTML HERE - DELETE EVERYTHING INSIDE THE BODY EXCEPT THE SCRIPTS ON THE BOTTOM TO START FROM SCRATCH -->
-	<!-- DON'T WRITE CSS IN YOUR HTML LIKE WE DID HERE - THE INLINE CSS SHOULD HELP YOU TO UNDERSTAND THE BEHAVIOR OF THE ELEMENTS BETTER -
-		 WHEN SUBMITTING, WE ALWAYS EXPECT CLEAR SEPARATION OF HTML, CSS, AND JS INTO THE PROPER FILES -->
 	<body style="padding: 2vh">
 	<div class="container-fluid" >
-		<div class="row justify-content-center" style="height: 7vh;">
+		<div class="row justify-content-center" style="height: 10vh;">
 			<div class="align-self-center">
 				<h1>ON THE NOSE</h1>
 			</div>
 		</div>
-        <div class="row" style="height: 65vh;margin:5vh 0 1vh 0 ">
+        <div class="row" style="height: 70vh;margin:5vh 0 1vh 0 ">
             <div class = "col justify-content-center" id = "bubble-vis">
             </div>
 
         </div>
-        <div class = "row" style="height: 4vh;margin:0 0 0vh 0 ">
-<!--            <button type="button" id="groupButton" class="btn btn-primary" onClick="updateSelectedGroup()">Primary</button>-->
-<!--            <div class="row align-items-center">-->
-<!--                <div class="col-4"><p id="value-step"></p></div>-->
-<!--                <div class="col-8" ><div id="slider-step" onChange="updateSelectedGroup()"></div></div>-->
-<!--            </div>-->
-<!--            <div class="container">-->
-<!--                <div class="range-slider" id = "groupSelector" onChange="updateSelectedGroup()">-->
-<!--                    <span id="rs-bullet" class="rs-label">All</span>-->
-<!--                    <input id="rs-range-line" class="rs-range" type="range" step="1" value="0" min="0" max="4" >-->
-<!--&lt;!&ndash;                    <div class="sliderticks">&ndash;&gt;-->
-<!--&lt;!&ndash;                        <p></p>&ndash;&gt;-->
-<!--&lt;!&ndash;                        <p></p>&ndash;&gt;-->
-<!--&lt;!&ndash;                        <p></p>&ndash;&gt;-->
-<!--&lt;!&ndash;                        <p></p>&ndash;&gt;-->
-<!--&lt;!&ndash;                        <p></p>&ndash;&gt;-->
-<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
-
-<!--                </div>-->
-
-<!--&lt;!&ndash;                <div class="box-minmax">&ndash;&gt;-->
-<!--&lt;!&ndash;                    <span>All</span><span>Year</span><span>Month</span><span>Number Partners</span><span>Record Setting</span>&ndash;&gt;-->
-<!--&lt;!&ndash;                </div>&ndash;&gt;-->
-<!--            </div>-->
+        <div class = "row justify-content-center" style="height: 4vh;margin:0 0 0vh 0 ">
             <div class="btn-group btn-group-lg" id="aBtnGroup" role="group" aria-label="Basic example">
-                <button type="button" value="All" class="btn btn-secondary active">Overview</button>
-                <button type="button" value="Records" class="btn btn-secondary">Record</button>
-                <button type="button" value="Year" class="btn btn-secondary">Year</button>
-                <button type="button" value="Month" class="btn btn-secondary">Month</button>
-                <button type="button" value="Partners" class="btn btn-secondary">Partners</button>
-<!--                <div id="aBtnGroup" class="btn-group">-->
-<!--                    <button type="button" value="L" class="btn btn-default">Left</button>-->
-<!--                    <button type="button" value="M" class="btn btn-default">Middle</button>-->
-<!--                    <button type="button" value="R" class="btn btn-default">Right</button>-->
-<!--                </div>-->
+                <button type="button" value="All" class="btn btn-secondary allButton active">Overview</button>
+                <button type="button" value="Records" class="btn btn-secondary recButton ">Record</button>
+                <button type="button" value="Year" class="btn btn-secondary yearButton ">Year</button>
+                <button type="button" value="Month" class="btn btn-secondary monthButton">Month</button>
+                <button type="button" value="Partners" class="btn btn-secondary partnerButton">Partners</button>
+            </div>
+
+            <div class="btn-lg">
+                <button type="button" id="labelToggle" class="btn btn-secondary labelToggle" onClick="toggleLabel()">Toggle Labels</button>
             </div>
 
         </div>
@@ -97,23 +69,6 @@
 	<script src="js/main.js"></script>
 	<script src="js/bubble_chart.js"></script>
     <script>
-        // var rangeSlider = document.getElementById("rs-range-line");
-        // var rangeBullet = document.getElementById("rs-bullet");
-        // var data2 = ['All', 'Records','Year', 'Month', 'Partners']
-        //
-        // rangeSlider.addEventListener("input", showSliderValue, false);
-        //
-        // function showSliderValue() {
-        //     rangeBullet.innerHTML = data2[rangeSlider.value];
-        //     var bulletPosition = (rangeSlider.value /rangeSlider.max);
-        //     rangeBullet.style.left = (bulletPosition * 500) + "px";
-        //     rangeBullet.style.width=data2[rangeSlider.value].length*30+"px";
-        // }
-
-
-        // $(document).ready(function() {
-        // let buttonVal='All'
-
             // Get click event, assign button to var, and get values from that var
             $('#aBtnGroup button').on('click', function() {
                 var thisBtn = $(this);
@@ -121,12 +76,9 @@
                 thisBtn.addClass('active').siblings().removeClass('active');
                 var btnText = thisBtn.text();
                 var btnValue = thisBtn.val();
-                console.log(btnText + ' - ' + btnValue);
-                //
-                // $('#selectedVal').text(btnValue);
+
                 updateSelectedGroup(thisBtn.val())
             });
-
 
     </script>
 	</body>

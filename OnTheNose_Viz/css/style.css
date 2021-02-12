@@ -16,7 +16,7 @@ h1 {
     color: white;
 }
 
-.yearLabel, .recordLabel,.partnerLabel,.monthLabel{
+.label{
     font-family: 'Roboto';
     font-size: 30pt;
     /*color: white;*/
