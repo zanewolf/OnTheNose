@@ -107,7 +107,7 @@ class BubbleChart {
         // set up scale for radius
         vis.radiusScale = d3.scalePow()
             .exponent(0.5)
-            .range([1,32])
+            .range([1,vis.width/50])
             .domain([0, d3.max(vis.data, d=>d.HoursRounded)])
 
         // wrangle the data into the node format
@@ -192,7 +192,7 @@ class BubbleChart {
                 year: d.Year,
                 month: d.Month,
                 numPartner: d.numPartner,
-                partners: d.Partners,
+                partners: d.Partners == ''? "None" : d.Partners,
                 record: d.Records,
                 x: Math.random()*900,
                 y: Math.random()*500
@@ -218,6 +218,10 @@ class BubbleChart {
             .attr("opacity", d=> d.record == 'none'? 0.6  : 1)
             .attr('fill', d=>d.color_start)
             .on("mouseover", (event,d)=>{
+                d3.select(event.currentTarget)
+                    .attr('stroke','red')
+                    .attr('stroke-width', 3)
+                    // white fill works for some of the color legends but not for success or launches, where white is informational. Changed it to green, which is not used in either of those scales.
                 // console.log(d)
                 vis.tooltip
                     .style("opacity", 1)
@@ -225,14 +229,18 @@ class BubbleChart {
                     .style("top", event.pageY+10 + "px")
                     .attr('id', 'tooltip')
                     .html(`
-                     <div style="border: thin solid grey; border-radius: 5px; background: darkgray; padding: 20px">
-                         <p> <strong>Total Time: </strong>${d.actual_time}</p>
-                         <p> <strong> Partners: </strong> ${d.partners}</p>
-                         <p> <strong> Year </strong> ${d.year}</p>
-
-                     </div>`)
+                         <div style="border: thin solid grey; border-radius: 5px; background: white; padding: 20px">
+                            <p> <strong> Year: </strong> ${d.year}</p>
+                            <p> <strong>Total Time: </strong>${d.actual_time}</p>
+                            <p> <strong> Partners: </strong> ${d.partners}</p>
+                            <p> <strong> Record: </strong> ${d.record}
+                         </div>
+                    `)
             })
             .on("mouseout", (event,d)=>{
+                d3.select(event.currentTarget)
+                    .attr('stroke', d=>d.stroke_fill)
+                    .attr("stroke-width", d=> d.record == 'none'? 0 : 3)
                 vis.tooltip
                     .style("opacity", 0)
                     .style("left", 0)
@@ -431,53 +439,164 @@ class BubbleChart {
 
     centerLabels(vis){
         // console.log( 'overview labels')
-        vis.svg.append('g')
-            .attr('class', 'centerLabel label')
-            .attr("transform", "translate(" +3* vis.width / 16 + "," + 1* vis.height / 16 + ")")
-            .append('text')
-            .style('text-anchor', 'middle')
-            .text('Overview')
+        // vis.svg.append('g')
+        //     .attr('class', 'centerLabel label')
+        //     .attr("transform", "translate(" +3* vis.width / 16 + "," + 1* vis.height / 16 + ")")
+        //     .append('text')
+        //     .style('text-anchor', 'middle')
+        //     .text('Overview')
 
         vis.svg.append('g')
             .attr('class', 'centerLabel label aboutLabel')
-            .attr("transform", "translate(" +3* vis.width / 16 + "," + 3* vis.height / 16 + ")")
+            .attr("transform", "translate(" +2.5* vis.width / 16 + "," + 9* vis.height / 16 + ")")
             .append('text')
             .style('font-size', '12pt')
             .style('text-anchor', 'middle')
-            .text("For the last three decades, Hans Florine has climbed the the same 3000+ foot (900m) climb over 100 times. And he got really quick at it. He was not the first to climb the Nose, this historic climb up El Capitan in Yosemite, in under a day, but he was the first to do so in under 10 hours. And then 6...4...3...2 and a half. While Hans is not the current record-holder, he reset the 'Classic' two-man team speed record 8 times. These are his climbs.")
+            .text("For the last three decades, Hans Florine has climbed the same 3000+ foot (900m) climb over 100 times. And he got really quick at it. He was not the first to climb the Nose, this historic climb up El Capitan in Yosemite, in under a day, but he was the first to do so in under 10 hours. And then 6...4...3...2 and a half. Hans reset the 'Classic' two-man team speed record 8 times, in addition to a few other speed records. These are his 101 climbs on the Nose.")
             .call(vis.wrap, vis.width/4)
+
+            // .html(`
+            //          <div style="border: thin solid grey; border-radius: 5px; background: darkgray; padding: 20px">
+            //              <p> <strong>Total Time: </strong></p>
+            //
+            //          </div>`)
+
+        // vis.circleCoords = {
+        //     0: {x:2*vis.width/16, y: 10*vis.height/16, r:35 },
+        //     1: {x:4*vis.width/16, y: 10*vis.height/16, r:27 }
+        // }
+
+        // console.log( vis.circleCoords[1].x)
 
         vis.svg.append('g')
             .attr('class', 'centerLabel label')
-            .attr("transform", "translate(" +3* vis.width / 16 + "," + 1* vis.height / 16 + ")")
+            // .attr("transform", "translate(" +3* vis.width / 16 + "," + 1* vis.height / 16 + ")")
             .append('circle')
-            .attr('cx',2*vis.width/16)
-            .attr('cy', 8*vis.height/16)
-            .attr('r', 35)
+            .attr('cx',12*vis.width/16)
+            .attr('cy',  7*vis.height/16)
+            .attr('r', vis.radiusScale(96))
+            .attr('stroke', 'white')
+            .attr('fill', 'none')
+            .attr('opacity', '1')
+        //
+        // vis.svg.append('g')
+        //     .attr('class', 'centerLabel label')
+        //     // .attr("transform", "translate(" +3* vis.width / 16 + "," + 1* vis.height / 16 + ")")
+        //     .append('circle')
+        //     .attr('cx',1.5*vis.width/16)
+        //     .attr('cy',  10*vis.height/16)
+        //     .attr('r', vis.radiusScale(72))
+        //     .attr('stroke', 'white')
+        //     .attr('fill', 'none')
+        //     .attr('opacity', '0.9')
+
+        vis.svg.append('g')
+            .attr('class', 'centerLabel label')
+            // .attr("transform", "translate(" +3* vis.width / 16 + "," + 1* vis.height / 16 + ")")
+            .append('circle')
+            .attr('cx',12*vis.width/16)
+            .attr('cy',  7*vis.height/16)
+            .attr('r', vis.radiusScale(48))
+            .attr('stroke', 'white')
+            .attr('fill', 'none')
+            .attr('opacity', '0.8')
+
+        vis.svg.append('g')
+            .attr('class', 'centerLabel label')
+            // .attr("transform", "translate(" +3* vis.width / 16 + "," + 1* vis.height / 16 + ")")
+            .append('circle')
+            .attr('cx',12*vis.width/16)
+            .attr('cy',  7*vis.height/16)
+            .attr('r', vis.radiusScale(24))
+            .attr('stroke', 'white')
+            .attr('fill', 'none')
+            .attr('opacity', '0.7')
+
+        vis.svg.append('g')
+            .attr('class', 'centerLabel label')
+            // .attr("transform", "translate(" +3* vis.width / 16 + "," + 1* vis.height / 16 + ")")
+            .append('circle')
+            .attr('cx',12*vis.width/16)
+            .attr('cy',  7*vis.height/16)
+            .attr('r', vis.radiusScale(3))
+            .attr('fill', 'none')
+            .attr('stroke', 'white')
+            .attr('opacity', '0.6')
+
+        vis.svg.append('g')
+            .attr('class', 'centerLabel label legend')
+            .attr("transform", "translate(" +12.5* vis.width / 16 + "," + 7* vis.height / 16 + ")")
+            .append('text')
+            .text("Duration (Hours) of each Climb")
+            .call(vis.wrap, vis.width/6)
+
+        vis.svg.append('g')
+            .attr('class', 'centerLabel label')
+            // .attr("transform", "translate(" +3* vis.width / 16 + "," + 1* vis.height / 16 + ")")
+            .append('circle')
+            .attr('cx',12*vis.width/16)
+            .attr('cy',  8*vis.height/16)
+            .attr('r', vis.radiusScale(96))
             .attr('fill', 'white')
             .attr('stroke', 'none')
             .attr('opacity', '0.6')
+
+        vis.svg.append('g')
+            .attr('class', 'centerLabel label legend')
+            .attr("transform", "translate(" +12.5* vis.width / 16 + "," + 8* vis.height / 16 + ")")
+            .append('text')
+            .text("Climb")
+            .call(vis.wrap, vis.width/6)
+
+        vis.svg.append('g')
+            .attr('class', 'centerLabel label')
+            // .attr("transform", "translate(" +3* vis.width / 16 + "," + 1* vis.height / 16 + ")")
+            .append('circle')
+            .attr('cx',12*vis.width/16)
+            .attr('cy',  9*vis.height/16)
+            .attr('r', vis.radiusScale(96))
+            .attr('fill', 'white')
+            .attr('stroke', 'black')
+            .attr('stroke-width', '3pt')
+            .attr('opacity', '1')
+
+        vis.svg.append('g')
+            .attr('class', 'centerLabel label legend')
+            .attr("transform", "translate(" +12.5* vis.width / 16 + "," + 9* vis.height / 16 + ")")
+            .append('text')
+            .text("Record-Setting Climb")
+            .call(vis.wrap, vis.width/6)
+
+        vis.svg.append('svg:image')
+            .attr('class', 'centerLabel label noseimage')
+            .attr("transform", "translate(" +0.5* vis.width / 16 + "," + 4* vis.height / 16 + ")")
+            .attr("xlink:href", function() {return "./imgs/thenose5.png"})
+            .attr('width', "50")
+            .attr('height', "50")
     }
+
+
+    // }
 
     recordLabels(vis) {
         // at some point, I could just create an array with the text and the x,y coordinates and pass them in as the data to make rather than having GOD KNOWS HOW MANY DIFFERENT CREATIONS OF EACH INDIVIDUAL LABEL. Dummy.
         // how to pass d into transform/translate attribute though??
-        // vis.recordLabels = {
-        //     'None': {x: 4 * vis.width / 16, y: 13 * vis.height / 16},
-        //     'Classic': {x: 4 * vis.width / 8, y: 13 * vis.height / 16},
-        //     'Solo':{x:4 * vis.width / 8, y: 3 * vis.height / 16},
-        //     '4-Person':{x: 12 * vis.width / 16, y:13 * vis.height / 16},
-        //     'Male-Female':{x: 12 * vis.width / 16, y: 3 * vis.height / 16}
+        // vis.recordLabels = [
+        //     {Name: 'None', x: 4 * vis.width / 16, y: 13 * vis.height / 16},
+        //     {Name: 'Classic', x: 4 * vis.width / 8, y: 13 * vis.height / 16},
+        //     {Name: 'Solo', x:4 * vis.width / 8, y: 3 * vis.height / 16},
+        //     {Name: '4-Person',x: 12 * vis.width / 16, y:13 * vis.height / 16},
+        //     {Name: 'Male-Female',x: 12 * vis.width / 16, y: 3 * vis.height / 16}
         //
-        // }
-
+        // ]
+        //
         // vis.svg.append('g')
         //     .datum(vis.recordLabels)
         //     .attr('class', 'recordLabel label')
         //     .attr("transform", "translate(" + 4 * vis.width / 8 + "," + 13 * vis.height / 16 + ")")
         //     .append('text')
         //     .style('text-anchor', 'start')
-        //     .text((d,i)=>d[i].val)
+        //     .text(d=>d.Name)
         // console.log('record labels')
         vis.svg.append('g')
             .attr('class', 'recordLabel label')
@@ -557,14 +676,14 @@ class BubbleChart {
         vis.svg.append('g')
             .attr('class', 'partnerLabel label')
             .append('text')
-            .attr("transform", "translate(" +4 * vis.width / 16 + "," + 13.5 * vis.height / 16 + ")")
+            .attr("transform", "translate(" +4 * vis.width / 16 + "," + 13.25 * vis.height / 16 + ")")
             .style('text-anchor', 'middle')
             .text('5')
 
         vis.svg.append('g')
             .attr('class', 'partnerLabel label')
             .append('text')
-            .attr("transform", "translate(" +12.5 * vis.width / 16 + "," + 13.5 * vis.height / 16 + ")")
+            .attr("transform", "translate(" +12.5 * vis.width / 16 + "," + 13.25 * vis.height / 16 + ")")
             .style('text-anchor', 'middle')
             .text('6')
     }
@@ -627,6 +746,22 @@ class BubbleChart {
             .attr("transform", "translate(" +12.5 * vis.width / 16 + "," + 15.5 * vis.height / 16 + ")")
             .style('text-anchor', 'middle')
             .text('NOV')
+    }
+
+    colorLegend(vis){
+        vis.svg.append('g')
+            .attr('class', 'centerLabel label')
+            // .attr("transform", "translate(" +3* vis.width / 16 + "," + 1* vis.height / 16 + ")")
+            .append('circle')
+            .attr('cx',6*vis.width/16)
+            .attr('cy',  15*vis.height/16)
+            .attr('r', vis.radiusScale(30))
+            .attr('fill', vis.colorRecords2('None'))
+            .attr('stroke', 'black')
+            .attr('stroke-width', '2pt')
+            .attr('opacity', '1')
+
+
     }
 
     wrap(text, width) {

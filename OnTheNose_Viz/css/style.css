@@ -35,6 +35,18 @@ h1 {
     font-size: 12pt;
 }
 
+.legend{
+    font-family: 'Roboto Slab';
+    font-size: 12pt;
+    font-weight: lighter;
+}
+
+.noseimage{
+    height: 25%;
+    width: 25%;
+    z-index: 1000;
+}
+
 #bubble-vis, .timeline {
     height: 100%;
     width: 100%;
