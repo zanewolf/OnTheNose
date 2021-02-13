@@ -11,7 +11,8 @@ class BubbleChart {
         let vis = this;
 
         var notUpdated = true;
-        vis.prevLabelSelector='';
+        vis.prevLabelSelectors=[];
+        vis.prevLabel='';
         vis.currentLabelSelector='';
 
         //set up svg area
@@ -267,7 +268,8 @@ class BubbleChart {
         } else if (vis.selectedGroup=="Year"){
             plottingFunction = vis.yearBubbles
             labelFunction=vis.yearLabels
-            // vis.yearLabels(vis)
+            // it make look redundant to have all the record_fills, but I initially started off which each selection having it's own color scheme/scale and decided that it was too much
+            // and then was too lazy to rewrite the code and remove the redundancy. Go me.
             vis.colorSelector='record_fill'
             vis.currentLabelSelector='year'
 
@@ -290,32 +292,35 @@ class BubbleChart {
             vis.currentLabelSelector='record'
 
         } else {
+            // ya know....jut in case.
             console.warn("Button does not match acceptable options")
         }
 
-
         // the bubbles will update position based on the plottingfunction passed to it
         vis.plotBubbles(plottingFunction)
-        vis.updateLabels(vis,vis.prevLabelSelector,labelFunction)
+
+        // Okay, so, this next bit of code looks unweildy but was designed to increase efficiency.
+        // if fact, you might be asking, why have vis.prevLabelSelectors, vis.prevLabel, AND vis.currentLabelSelector. Bare with me.
+        // Problem: the original version of updateLabels just took two inputs (not including vis):
+        // previous label and label function. With these, it deleted the previous labels and called the label function to create new labels.
+        // you can probably already see how this is wasteful. Create new labels, delete old ones, create new labels, delete old ones, and so on. At some point, you're going to be remaking labels the code has already made.
+        // to solve this, I decided to create a cache, vis.prevLabelSelectors
+        // if the labels have never been called before, then add add the current selector to this array. However, if they HAVE been made before, don't. It won't serve to have an ever-growing array
+        // Now, I want to call the updateLabel function with the list of labels that have already been made, excluding the current one (prevLabelSelectors), I want to know exactly which label is currently on the screen so I can deactivate just that one (prevLabel), and I want to know which label I'm both being asked to make (currentLabelSelector) and which function I need to use to make it (labelFunction) so that if currentLabelSelector IS in prevLabelSelectors, then I know which one to toggle.
+        vis.updateLabels(vis,vis.prevLabelSelectors, vis.prevLabel, vis.currentLabelSelector,labelFunction)
 
 
-        vis.prevLabelSelector=vis.currentLabelSelector;
-        // vis.currentLabelSelector='';
+        // add the current label to the prevLabelSelectors if it's not already there
+        if (vis.prevLabelSelectors.includes(vis.currentLabelSelector)==false){
+            vis.prevLabelSelectors.push(vis.currentLabelSelector)
+        }
+
+        // and update the previouslabel value
+        vis.prevLabel=vis.currentLabelSelector;
 
 
-        // the labels will update based on the selected group
-        // vis.updateLabels(labelSelector)
-
-
-        if (notUpdated == true){
-            // console.log( 'first render')
-            // have the pop up about the background displayed. Shouldn't pop up again unless page is refreshed
-            // have the overview/facts/how to read pop up - disable with toggle
-            // vis.plotAnnotations(vis)
-        } else {
-            // console.log('rerendered')
-            // update the bubble color. For some reason, this command only works properly in an if statement.
-            // update the labels here??
+        // update color of the bubbles. for SOME REASON, if this call is outside of an if statement, the rendering looks fucked up. Try it if you don't believe me. I have no clue why.
+        if (notUpdated !== true){
             vis.updateBubbleColor(vis, vis.colorSelector)
         }
 
@@ -332,7 +337,7 @@ class BubbleChart {
 
     }
 
-    // because the following group of functions are called from a nested function, it is necessary to pass them this.
+    // because the following group of functions are called from a nested function, it is necessary to pass them 'this'. Apparently. TIL.
     updateBubbleColor(vis,colorSelector){
         vis.bubbles
             // .enter()
@@ -344,12 +349,20 @@ class BubbleChart {
 
     }
 
-    updateLabels(vis,prevLabelSelector,labelFunction){
-        // console.log('current label', prevLabelSelector)
-        vis.svg.selectAll('.'+prevLabelSelector+'Label').remove();
+    updateLabels(vis,prevLabelSelectors,prevLabel,currentLabelSelector,labelFunction){
 
-        labelFunction(vis);
+        //if the current label HAS been made before, toggle both the label currently on the screen (prevLabel) to deactivate it and the current label to activate it.
+        if (prevLabelSelectors.includes(currentLabelSelector)){
+            $('.'+currentLabelSelector+'Label').toggle()
+            $('.'+prevLabel+'Label').toggle()
+        } else{
+            // if the current label has NOT been made, make it and toggle the prevLabel
+            $('.'+prevLabel+'Label').toggle()
+            labelFunction(vis);
+        }
+
     }
+
     centerBubbles(d,vis, coord){
         // console.log('centerbubbles',d)
         // return (900/2);
@@ -419,10 +432,12 @@ class BubbleChart {
     centerLabels(vis){
         // console.log( 'overview labels')
     }
+
     recordLabels(vis) {
-        // vis.recordCoords = {
-        //     'none': {x: vis.width/4, y: vis.height/2},
-        //     'speed record': {x:4*vis.width/8, y: 5*vis.height/8},
+        // at some point, I could just create an array with the text and the x,y coordinates and pass them in as the data to make rather than having GOD KNOWS HOW MANY DIFFERENT CREATIONS OF EACH INDIVIDUAL LABEL. Dummy. 
+        // vis.recordLabels = {
+        //     'None': {x: 4 * vis.width / 16, y: 13 * vis.height / 16},
+        //     'Speed Record': {x:4*vis.width/8, y: 5*vis.height/8},
         //     'solo record':{x:4*vis.width/8, y: 3*vis.height/8},
         //     'four-person team record':{x: 6*vis.width/8, y: 5*vis.height/8},
         //     'male-female record':{x: 6*vis.width/8, y: 3*vis.height/8}

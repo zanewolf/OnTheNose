@@ -17,6 +17,10 @@ h1 {
 }
 
 .label{
+
+}
+
+.yearLabel, .partnerLabel, .monthLabel, .recordLabel, .centerLabel{
     font-family: 'Roboto';
     font-size: 30pt;
     /*color: white;*/

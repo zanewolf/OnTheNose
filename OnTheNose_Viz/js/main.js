@@ -51,13 +51,19 @@ function createVis(data){
 }
 
 function updateSelectedGroup(buttonVal){
-    console.log('updated', buttonVal)
+    // console.log('updated', buttonVal)
     var notUpdated = false;
     // clusterVis.plotMaster(data2[$('#rs-range-line').val()], notUpdated)
     clusterVis.plotMaster(buttonVal.toString(), notUpdated)
 
 }
 
-function toggleLabel(){
-    $('.label').toggle();
-}
+// function toggleLabel(){
+//     // console.log('toggle', $('#labelToggle').val())
+//     $('.label').toggle()
+//     // if ($('#labelToggle').val()=='on'){
+//     //     $('#labelToggle').val('off')
+//     // } else{
+//     //     $('#labelToggle').val('on')
+//     // }
+// }
