@@ -29,6 +29,12 @@ h1 {
     fill: white;
 }
 
+.aboutLabel{
+    font-family: 'Roboto Slab';
+    font-weight: lighter;
+    font-size: 12pt;
+}
+
 #bubble-vis, .timeline {
     height: 100%;
     width: 100%;
@@ -38,6 +44,7 @@ h1 {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    /*stroke: */
 }
 /*.box-minmax{*/
 /*    margin-top: 30px;*/

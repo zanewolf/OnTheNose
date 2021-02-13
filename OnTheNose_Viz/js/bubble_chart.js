@@ -263,7 +263,7 @@ class BubbleChart {
                 // addOverviewFacts()
             plottingFunction = vis.centerBubbles
             labelFunction=vis.centerLabels
-            vis.currentLabelSelector='overview'
+            vis.currentLabelSelector='center'
 
         } else if (vis.selectedGroup=="Year"){
             plottingFunction = vis.yearBubbles
@@ -431,18 +431,53 @@ class BubbleChart {
 
     centerLabels(vis){
         // console.log( 'overview labels')
+        vis.svg.append('g')
+            .attr('class', 'centerLabel label')
+            .attr("transform", "translate(" +3* vis.width / 16 + "," + 1* vis.height / 16 + ")")
+            .append('text')
+            .style('text-anchor', 'middle')
+            .text('Overview')
+
+        vis.svg.append('g')
+            .attr('class', 'centerLabel label aboutLabel')
+            .attr("transform", "translate(" +3* vis.width / 16 + "," + 3* vis.height / 16 + ")")
+            .append('text')
+            .style('font-size', '12pt')
+            .style('text-anchor', 'middle')
+            .text("For the last three decades, Hans Florine has climbed the the same 3000+ foot (900m) climb over 100 times. And he got really quick at it. He was not the first to climb the Nose, this historic climb up El Capitan in Yosemite, in under a day, but he was the first to do so in under 10 hours. And then 6...4...3...2 and a half. While Hans is not the current record-holder, he reset the 'Classic' two-man team speed record 8 times. These are his climbs.")
+            .call(vis.wrap, vis.width/4)
+
+        vis.svg.append('g')
+            .attr('class', 'centerLabel label')
+            .attr("transform", "translate(" +3* vis.width / 16 + "," + 1* vis.height / 16 + ")")
+            .append('circle')
+            .attr('cx',2*vis.width/16)
+            .attr('cy', 8*vis.height/16)
+            .attr('r', 35)
+            .attr('fill', 'white')
+            .attr('stroke', 'none')
+            .attr('opacity', '0.6')
     }
 
     recordLabels(vis) {
-        // at some point, I could just create an array with the text and the x,y coordinates and pass them in as the data to make rather than having GOD KNOWS HOW MANY DIFFERENT CREATIONS OF EACH INDIVIDUAL LABEL. Dummy. 
+        // at some point, I could just create an array with the text and the x,y coordinates and pass them in as the data to make rather than having GOD KNOWS HOW MANY DIFFERENT CREATIONS OF EACH INDIVIDUAL LABEL. Dummy.
+        // how to pass d into transform/translate attribute though??
         // vis.recordLabels = {
         //     'None': {x: 4 * vis.width / 16, y: 13 * vis.height / 16},
-        //     'Speed Record': {x:4*vis.width/8, y: 5*vis.height/8},
-        //     'solo record':{x:4*vis.width/8, y: 3*vis.height/8},
-        //     'four-person team record':{x: 6*vis.width/8, y: 5*vis.height/8},
-        //     'male-female record':{x: 6*vis.width/8, y: 3*vis.height/8}
-
+        //     'Classic': {x: 4 * vis.width / 8, y: 13 * vis.height / 16},
+        //     'Solo':{x:4 * vis.width / 8, y: 3 * vis.height / 16},
+        //     '4-Person':{x: 12 * vis.width / 16, y:13 * vis.height / 16},
+        //     'Male-Female':{x: 12 * vis.width / 16, y: 3 * vis.height / 16}
+        //
         // }
+
+        // vis.svg.append('g')
+        //     .datum(vis.recordLabels)
+        //     .attr('class', 'recordLabel label')
+        //     .attr("transform", "translate(" + 4 * vis.width / 8 + "," + 13 * vis.height / 16 + ")")
+        //     .append('text')
+        //     .style('text-anchor', 'start')
+        //     .text((d,i)=>d[i].val)
         // console.log('record labels')
         vis.svg.append('g')
             .attr('class', 'recordLabel label')
@@ -539,7 +574,7 @@ class BubbleChart {
 
         vis.svg.append('g')
             .attr('class', 'monthLabel label')
-            .attr("transform", "translate(" +2* vis.width / 16 + "," + 3.5 * vis.height / 16 + ")")
+            .attr("transform", "translate(" +3.25* vis.width / 16 + "," + 1* vis.height / 16 + ")")
             .append('text')
             .style('text-anchor', 'start')
             .text('MAR')
@@ -547,51 +582,75 @@ class BubbleChart {
         vis.svg.append('g')
             .attr('class', 'monthLabel label')
             .append('text')
-            .attr("transform", "translate(" + 6 * vis.width / 16 + "," + 3.5 * vis.height / 16 + ")")
+            .attr("transform", "translate(" + 7.5 * vis.width / 16 + "," + 1 * vis.height / 16 + ")")
             .style('text-anchor', 'start')
             .text('MAY')
 
         vis.svg.append('g')
             .attr('class', 'monthLabel label')
             .append('text')
-            .attr("transform", "translate(" + 11 * vis.width / 16 + "," + 3.5 * vis.height / 16 + ")")
+            .attr("transform", "translate(" + 12.25 * vis.width / 16 + "," + 1 * vis.height / 16 + ")")
             .style('text-anchor', 'middle')
             .text('JUN')
 
         vis.svg.append('g')
             .attr('class', 'monthLabel label')
             .append('text')
-            .attr("transform", "translate(" + 4 * vis.width / 16 + "," + 8.5 * vis.height / 16 + ")")
+            .attr("transform", "translate(" + 3.75 * vis.width / 16 + "," + 8.5 * vis.height / 16 + ")")
             .style('text-anchor', 'middle')
             .text('JUL')
 
         vis.svg.append('g')
             .attr('class', 'monthLabel label')
             .append('text')
-            .attr("transform", "translate(" +9.5 * vis.width / 16 + "," + 8.5 * vis.height / 16 + ")")
+            .attr("transform", "translate(" +12.25 * vis.width / 16 + "," + 8.5 * vis.height / 16 + ")")
             .style('text-anchor', 'middle')
             .text('AUG')
 
         vis.svg.append('g')
             .attr('class', 'monthLabel label')
             .append('text')
-            .attr("transform", "translate(" +2* vis.width / 16 + "," + 13 * vis.height / 16 + ")")
+            .attr("transform", "translate(" +3.75* vis.width / 16 + "," + 15.5 * vis.height / 16 + ")")
             .style('text-anchor', 'middle')
             .text('SEP')
 
         vis.svg.append('g')
             .attr('class', 'monthLabel label')
             .append('text')
-            .attr("transform", "translate(" +6.5 * vis.width / 16 + "," + 13.5 * vis.height / 16 + ")")
+            .attr("transform", "translate(" +8 * vis.width / 16 + "," + 15.5 * vis.height / 16 + ")")
             .style('text-anchor', 'middle')
             .text('OCT')
 
         vis.svg.append('g')
             .attr('class', 'monthLabel label')
             .append('text')
-            .attr("transform", "translate(" +11.5 * vis.width / 16 + "," + 13.5 * vis.height / 16 + ")")
+            .attr("transform", "translate(" +12.5 * vis.width / 16 + "," + 15.5 * vis.height / 16 + ")")
             .style('text-anchor', 'middle')
             .text('NOV')
+    }
+
+    wrap(text, width) {
+        text.each(function () {
+            var text = d3.select(this),
+                words = text.text().split(/\s+/).reverse(),
+                word,
+                line = [],
+                lineNumber = 0,
+                lineHeight = 1.2, // ems
+                y = text.attr("y"),
+                dy = 0,
+                tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr('dy', dy);
+            while (word = words.pop()) {
+                line.push(word);
+                tspan.text(line.join(" "));
+                if (tspan.node().getComputedTextLength() > width) {
+                    line.pop();
+                    tspan.text(line.join(" "));
+                    line = [word];
+                    tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", +lineHeight +"em").text(word);
+                }
+            }
+        });
     }
 }
 
